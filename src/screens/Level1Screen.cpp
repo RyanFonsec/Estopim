@@ -1,20 +1,39 @@
 #include "Level1Screen.h"
 
-Level1Screen::Level1Screen(TFT_eSPI* display) {
+#include "../math/MathGenerator.h"
 
+Level1Screen::Level1Screen(
+    TFT_eSPI* display,
+    InputSystem* in
+)
+
+: hud(display)
+{
     tft = display;
+
+    input = in;
+
+    lives = 3;
+
+    score = 0;
+
+    timeLeft = 15;
+
+    levelState = LevelState::PLAYING;
+
+    feedbackStart = 0;
+
+    staticDrawn = false;
 }
 
 void Level1Screen::onEnter() {
 
-    tft->fillScreen(TFT_BLACK);
+    generateQuestion();
+
+    needsRender = true;
 }
 
 void Level1Screen::onExit() {
-
-}
-
-void Level1Screen::update() {
 
 }
 
@@ -23,58 +42,141 @@ GameState Level1Screen::getState() {
     return GameState::LEVEL1;
 }
 
-void Level1Screen::render() {
+void Level1Screen::generateQuestion() {
+
+    currentQuestion =
+        MathGenerator::generateEasyQuestion();
+
+    timeLeft = 15;
+
+    levelState = LevelState::PLAYING;
+
+    needsRender = true;
+
+    staticDrawn = false;
+}
+
+void Level1Screen::checkAnswer(int answerIndex) {
+
+    if(levelState != LevelState::PLAYING) {
+
+        return;
+    }
+
+    if(answerIndex ==
+       currentQuestion.correctIndex) {
+
+        score += 100;
+
+        levelState = LevelState::CORRECT;
+    }
+    else {
+
+        lives--;
+
+        levelState = LevelState::WRONG;
+    }
+
+    feedbackStart = millis();
+
+    needsRender = true;
+}
+
+void Level1Screen::update() {
+
+    // TIMER
+
+    if(levelState == LevelState::PLAYING && timer.every(1000)) {
+
+        timeLeft--;
+
+        needsRender = true;
+
+            if(timeLeft <= 0) {
+
+            lives--;
+
+            levelState = LevelState::TIMEOUT;
+
+            feedbackStart = millis();
+
+            needsRender = true;
+        }
+    }
+
+    // INPUTS
+
+    if(levelState == LevelState::PLAYING && input->wasPressed(Button::BTN_GREEN)){
+
+        checkAnswer(0);
+    }
+
+    if(levelState == LevelState::PLAYING && input->wasPressed(Button::BTN_BLUE)){
+
+        checkAnswer(1);
+    }
+
+    if(levelState == LevelState::PLAYING && input->wasPressed(Button::BTN_YELLOW)){
+
+        checkAnswer(2);
+    }
+
+    // =====================================
+    // FEEDBACK TIMER
+    // =====================================
+
+    if(levelState == LevelState::CORRECT ||
+    levelState == LevelState::WRONG ||
+    levelState == LevelState::TIMEOUT) {
+
+        if(millis() - feedbackStart > 1200) {
+
+            generateQuestion();
+        }
+    }
+}
+
+void Level1Screen::renderStatic() {
 
     tft->fillScreen(TFT_DARKGREY);
 
-    // =====================================
-    // HUD
-    // =====================================
+    // inimigo
 
-    tft->setTextColor(TFT_WHITE);
+    tft->fillRect(110, 50, 100, 50, TFT_RED);
 
-    tft->drawString("VIDAS: 3", 10, 10, 2);
+    tft->drawCentreString("INIMIGO", 160, 65, 2);
 
-    tft->drawString("TEMPO: 15", 200, 10, 2);
+    staticDrawn = true;
+}
 
-    // =====================================
-    // AREA DO JOGO
-    // =====================================
+void Level1Screen::renderDynamic() {
 
-    // FUTURO:
-    // Sprite do inimigo
-    // tft->pushImage(...)
+    hud.render();
 
-    tft->fillRect(110, 50, 100, 60, TFT_RED);
+    // limpa área pergunta
 
-    tft->drawCentreString("INIMIGO", 160, 70, 2);
+    tft->fillRect(0, 110, 320, 130, TFT_DARKGREY);
 
-    // =====================================
-    // PERGUNTA
-    // =====================================
+    String question =
 
-    tft->setTextColor(TFT_YELLOW);
+        String(currentQuestion.num1)
+        + " "
+        + currentQuestion.operation
+        + " "
+        + String(currentQuestion.num2)
+        + " = ?";
 
-    tft->drawCentreString("7 + 5 = ?", 160, 140, 4);
+    tft->drawCentreString(question, 160, 130, 4);
 
-    // =====================================
-    // RESPOSTAS
-    // =====================================
+    // respostas...
+}
 
-    // Verde
-    tft->fillRect(15, 200, 80, 30, TFT_GREEN);
+void Level1Screen::render() {
 
-    tft->drawCentreString("12", 55, 208, 2);
+    if(!staticDrawn) {
 
-    // Azul
-    tft->fillRect(120, 200, 80, 30, TFT_BLUE);
+        renderStatic();
+    }
 
-    tft->drawCentreString("10", 160, 208, 2);
-
-    // Amarelo
-    tft->fillRect(225, 200, 80, 30, TFT_YELLOW);
-
-    tft->setTextColor(TFT_BLACK);
-
-    tft->drawCentreString("15", 265, 208, 2);
+    renderDynamic();
 }

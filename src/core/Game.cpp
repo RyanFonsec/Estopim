@@ -7,19 +7,18 @@
 #include "../screens/WinScreen.h"
 #include "../screens/GameOverScreen.h"
 
-// =====================================
-// SCREENS
-// =====================================
 
-static MenuScreen menuScreen(nullptr);
-static IntroScreen introScreen(nullptr);
-static Level1Screen level1Screen(nullptr);
-static PauseScreen pauseScreen(nullptr);
-static WinScreen winScreen(nullptr);
-static GameOverScreen gameOverScreen(nullptr);
 
-Game::Game(TFT_eSPI* display) {
+Game::Game(TFT_eSPI* display)
 
+: menuScreen(display),
+  introScreen(display),
+  level1Screen(display, &input),
+  pauseScreen(display),
+  winScreen(display),
+  gameOverScreen(display)
+
+{
     tft = display;
 }
 
@@ -69,13 +68,6 @@ void Game::changeState(GameState newState) {
 void Game::begin() {
 
     input.begin();
-
-    menuScreen = MenuScreen(tft);
-    introScreen = IntroScreen(tft);
-    level1Screen = Level1Screen(tft);
-    pauseScreen = PauseScreen(tft);
-    winScreen = WinScreen(tft);
-    gameOverScreen = GameOverScreen(tft);
 
     changeState(GameState::MENU);
 }
