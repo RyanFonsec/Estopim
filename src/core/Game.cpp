@@ -121,21 +121,7 @@ void Game::update() {
                 changeState(GameState::PAUSE);
             }
 
-            // TESTE WIN
-
-            if(input.wasPressed(Button::BTN_GREEN)) {
-
-                changeState(GameState::WIN);
-            }
-
-            // TESTE GAME OVER
-
-            if(input.wasPressed(Button::BTN_BLUE)) {
-
-                changeState(GameState::GAME_OVER);
-            }
-
-            break;
+         break;
 
         // =====================
         // PAUSE

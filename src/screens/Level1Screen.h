@@ -28,6 +28,10 @@ private:
 
     bool staticDrawn;
 
+    bool questionDirty;
+
+    bool feedbackDirty;
+    
     int lives;
 
     int score;
@@ -60,6 +64,11 @@ public:
     void renderStatic();
 
     void renderDynamic();
+
+    void renderFeedback();
+
+    void renderQuestion();
+
 
     GameState getState() override;
 
