@@ -3,6 +3,7 @@
 #include "../math/MathGenerator.h"
 #include "../assets/backgrounds/level1_bg.h"
 #include "../assets/sprites/player_cannon.h"
+#include "../systems/FeedbackSystem.h"
 
 Level1Screen::Level1Screen(
     TFT_eSPI* display,
@@ -29,13 +30,11 @@ Level1Screen::Level1Screen(
 
     questionDirty = true;
 
-    feedbackDirty = true;
 }
 
 void Level1Screen::onEnter() {
 
     generateQuestion();
-
     needsRender = true;
 }
 
@@ -50,6 +49,8 @@ GameState Level1Screen::getState() {
 
 void Level1Screen::generateQuestion() {
 
+     feedback.clear();
+
     currentQuestion =
         MathGenerator::generateEasyQuestion();
 
@@ -58,8 +59,6 @@ void Level1Screen::generateQuestion() {
     levelState = LevelState::PLAYING;
 
     questionDirty = true;
-
-    feedbackDirty = true;
 
     needsRender = true;
 }
@@ -77,17 +76,18 @@ void Level1Screen::checkAnswer(int answerIndex) {
         score += 100;
 
         levelState = LevelState::CORRECT;
+        feedback.success();
     }
     else {
 
         lives--;
 
         levelState = LevelState::WRONG;
+        feedback.error();
     }
 
     feedbackStart = millis();
 
-    feedbackDirty = true;
     
     needsRender = true;
 }
@@ -109,6 +109,8 @@ void Level1Screen::update() {
             levelState = LevelState::TIMEOUT;
 
             feedbackStart = millis();
+            
+            feedback.timeout();
 
             needsRender = true;
         }
@@ -167,8 +169,8 @@ void Level1Screen::renderStatic() {
 
     // Personagem do jogador
     tft->pushImage(
-        128,
-        50,
+        15,
+        80,
         64,
         64,
         player_cannon,
@@ -202,7 +204,6 @@ void Level1Screen::renderDynamic() {
 
     renderQuestion();
 
-    renderFeedback();
 }
 
 void Level1Screen::renderQuestion() {
@@ -216,10 +217,10 @@ void Level1Screen::renderQuestion() {
 
     tft->pushImage(
     0,
-    110,
+    130,
     320,
     120,
-    level1_bg + (110 * 320)
+    level1_bg + (130 * 320)
     );
 
     tft->setTextColor(TFT_WHITE);
@@ -236,7 +237,7 @@ void Level1Screen::renderQuestion() {
     tft->drawCentreString(
         question,
         160,
-        130,
+        150,
         4
     );
 
@@ -302,70 +303,7 @@ void Level1Screen::renderQuestion() {
     questionDirty = false;
 }
 
-void Level1Screen::renderFeedback() {
 
-    if(!feedbackDirty) {
-
-        return;
-    }
-
-    // limpa área feedback
-
-    tft->pushImage(
-        0,
-        160,
-        320,
-        30,
-        level1_bg + (160 * 320)
-    );
-
-    switch(levelState) {
-
-        case LevelState::CORRECT:
-
-            tft->setTextColor(TFT_GREEN);
-
-            tft->drawCentreString(
-                "CORRETO!",
-                160,
-                165,
-                2
-            );
-
-            break;
-
-        case LevelState::WRONG:
-
-            tft->setTextColor(TFT_RED);
-
-            tft->drawCentreString(
-                "ERRADO!",
-                160,
-                165,
-                2
-            );
-
-            break;
-
-        case LevelState::TIMEOUT:
-
-            tft->setTextColor(TFT_ORANGE);
-
-            tft->drawCentreString(
-                "TEMPO ESGOTADO!",
-                160,
-                165,
-                2
-            );
-
-            break;
-
-        default:
-            break;
-    }
-
-    feedbackDirty = false;
-}
 
 void Level1Screen::render() {
 

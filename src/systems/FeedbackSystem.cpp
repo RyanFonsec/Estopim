@@ -1,66 +1,61 @@
 #include "FeedbackSystem.h"
-
 #include <Arduino.h>
 
 FeedbackSystem::FeedbackSystem() {
-
-    ledPin = 14;
-
-    buzzerPin = 13;
+    redPin = 21;
+    greenPin = 22;
+    bluePin = 13;
+    buzzerPin = 17;
+    buzzerChannel = 0;
 }
 
 void FeedbackSystem::begin() {
+    pinMode(redPin, OUTPUT);
+    pinMode(greenPin, OUTPUT);
+    pinMode(bluePin, OUTPUT);
 
-    pinMode(ledPin, OUTPUT);
+    // Inicia com todas as luzes apagadas (HIGH desliga anodo comum)
+    clear();
 
-    pinMode(buzzerPin, OUTPUT);
+    // PWM BUZZER
+    ledcSetup(buzzerChannel, 2000, 8);
+    ledcAttachPin(buzzerPin, buzzerChannel);
+}
+
+void FeedbackSystem::clear() {
+    // HIGH apaga as cores no LED Anodo Comum
+    digitalWrite(redPin, HIGH);
+    digitalWrite(greenPin, HIGH);
+    digitalWrite(bluePin, HIGH);
+
+    // Desliga o som do buzzer
+    ledcWriteTone(buzzerChannel, 0);
 }
 
 void FeedbackSystem::success() {
+    clear(); // Apaga tudo primeiro
 
-    digitalWrite(ledPin, HIGH);
+    // LOW acende a cor no LED Anodo Comum
+    digitalWrite(greenPin, LOW);
 
-    tone(buzzerPin, 1200);
-
-    delay(100);
-
-    noTone(buzzerPin);
-
-    digitalWrite(ledPin, LOW);
+    ledcWriteTone(buzzerChannel, 1200);
 }
 
 void FeedbackSystem::error() {
+    clear(); // Apaga tudo primeiro
 
-    digitalWrite(ledPin, HIGH);
+    // LOW acende a cor no LED Anodo Comum
+    digitalWrite(redPin, LOW);
 
-    tone(buzzerPin, 300);
-
-    delay(300);
-
-    noTone(buzzerPin);
-
-    digitalWrite(ledPin, LOW);
+    ledcWriteTone(buzzerChannel, 300);
 }
 
 void FeedbackSystem::timeout() {
+    clear(); // Apaga tudo primeiro
 
-    for(int i = 0; i < 2; i++) {
+    // Vermelho + Verde em LOW cria Amarelo (indicando tempo esgotado)
+    digitalWrite(redPin, LOW);
+    digitalWrite(greenPin, LOW);
 
-        digitalWrite(ledPin, HIGH);
-
-        tone(buzzerPin, 600);
-
-        delay(100);
-
-        digitalWrite(ledPin, LOW);
-
-        noTone(buzzerPin);
-
-        delay(100);
-    }
+    ledcWriteTone(buzzerChannel, 700);
 }
-
-
-//posterior mente mudar o delay, codigo exxperimental, nao usar em producao
-
-//integrar no gameplay com feedback.success() e feedback.error() e feedback.timeout()

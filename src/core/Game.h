@@ -14,6 +14,7 @@
 #include "../screens/PauseScreen.h"
 #include "../screens/WinScreen.h"
 #include "../screens/GameOverScreen.h"
+#include "../systems/FeedbackSystem.h"
 
 class Game {
 
@@ -24,6 +25,8 @@ private:
     InputSystem input;
 
     ScreenManager screenManager;
+
+    FeedbackSystem feedback;
 
     GameState currentState;
 

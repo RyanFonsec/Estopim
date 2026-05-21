@@ -4,9 +4,15 @@ class FeedbackSystem {
 
 private:
 
-    int ledPin;
+    int redPin;
+
+    int greenPin;
+
+    int bluePin;
 
     int buzzerPin;
+
+    int buzzerChannel;
 
 public:
 
@@ -19,4 +25,6 @@ public:
     void error();
 
     void timeout();
+
+    void clear();
 };

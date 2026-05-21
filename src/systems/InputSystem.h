@@ -40,7 +40,7 @@ public:
 
 Agora o jogo  usa:
 
-input.isPressed(Button::BTN_UP)
+input.isPressed(Button::BTN_GREEN)
 
 e NÃO:
 

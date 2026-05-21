@@ -6,7 +6,7 @@
 #include "../screens/PauseScreen.h"
 #include "../screens/WinScreen.h"
 #include "../screens/GameOverScreen.h"
-
+#include "../systems/FeedbackSystem.h"
 
 
 Game::Game(TFT_eSPI* display)
@@ -68,7 +68,7 @@ void Game::changeState(GameState newState) {
 void Game::begin() {
 
     input.begin();
-
+    feedback.begin();
     changeState(GameState::MENU);
 }
 
