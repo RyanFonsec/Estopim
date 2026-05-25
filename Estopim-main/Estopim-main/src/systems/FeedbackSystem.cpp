@@ -1,0 +1,61 @@
+#include "FeedbackSystem.h"
+#include <Arduino.h>
+
+FeedbackSystem::FeedbackSystem() {
+    redPin = 21;
+    greenPin = 22;
+    bluePin = 13;
+    buzzerPin = 17;
+    buzzerChannel = 0;
+}
+
+void FeedbackSystem::begin() {
+    pinMode(redPin, OUTPUT);
+    pinMode(greenPin, OUTPUT);
+    pinMode(bluePin, OUTPUT);
+
+    // Inicia com todas as luzes apagadas (HIGH desliga anodo comum)
+    clear();
+
+    // PWM BUZZER
+    ledcSetup(buzzerChannel, 2000, 8);
+    ledcAttachPin(buzzerPin, buzzerChannel);
+}
+
+void FeedbackSystem::clear() {
+    // HIGH apaga as cores no LED Anodo Comum
+    digitalWrite(redPin, HIGH);
+    digitalWrite(greenPin, HIGH);
+    digitalWrite(bluePin, HIGH);
+
+    // Desliga o som do buzzer
+    ledcWriteTone(buzzerChannel, 0);
+}
+
+void FeedbackSystem::success() {
+    clear(); // Apaga tudo primeiro
+
+    // LOW acende a cor no LED Anodo Comum
+    digitalWrite(greenPin, LOW);
+
+    ledcWriteTone(buzzerChannel, 1200);
+}
+
+void FeedbackSystem::error() {
+    clear(); // Apaga tudo primeiro
+
+    // LOW acende a cor no LED Anodo Comum
+    digitalWrite(redPin, LOW);
+
+    ledcWriteTone(buzzerChannel, 300);
+}
+
+void FeedbackSystem::timeout() {
+    clear(); // Apaga tudo primeiro
+
+    // Vermelho + Verde em LOW cria Amarelo (indicando tempo esgotado)
+    digitalWrite(redPin, LOW);
+    digitalWrite(greenPin, LOW);
+
+    ledcWriteTone(buzzerChannel, 700);
+}
