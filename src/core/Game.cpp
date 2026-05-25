@@ -30,6 +30,8 @@ void Game::changeState(GameState newState) {
 
     currentState = newState;
 
+    input.reset();
+
     switch(currentState) {
 
         case GameState::MENU:

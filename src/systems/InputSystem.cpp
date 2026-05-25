@@ -41,3 +41,12 @@ bool InputSystem::wasPressed(Button button) {
     return currentState[(int)button] &&
            !previousState[(int)button];
 }
+
+// função criada para resolver o erro de mudar de estado já apertando o botão
+void InputSystem::reset(){
+      for(int i = 0; i < 5; i++) {
+        // Lê o estado atual e força o anterior a ser igual
+        currentState[i] = digitalRead(buttonPins[i]);
+        previousState[i] = currentState[i]; 
+    }
+}

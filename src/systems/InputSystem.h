@@ -30,6 +30,8 @@ public:
 
     void update();
 
+    void reset();
+
     bool isPressed(Button button);
 
     bool wasPressed(Button button);
