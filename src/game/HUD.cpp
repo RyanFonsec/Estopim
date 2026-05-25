@@ -4,87 +4,83 @@ HUD::HUD(TFT_eSPI* display) {
 
     tft = display;
 
-    lives = 3;
+    lives = -1;
 
-    score = 0;
+    timeLeft = -1;
 
-    timeLeft = 15;
+    livesDirty = true;
 
-    lastLives = -1;
-    lastScore = -1;
-    lastTime = -1;
+    timeDirty = true;
 }
 
 void HUD::setLives(int value) {
 
-    lives = value;
+    if(lives != value) {
+
+        lives = value;
+
+        livesDirty = true;
+    }
 }
 
-void HUD::setScore(int value) {
-
-    score = value;
-}
 
 void HUD::setTime(int value) {
 
-    timeLeft = value;
+    if(timeLeft != value) {
+
+        timeLeft = value;
+
+        timeDirty = true;
+    }
 }
 
 void HUD::render() {
 
-    tft->setTextColor(TFT_WHITE);
+    renderLives();
 
-    // =========================
-    // VIDAS
-    // =========================
+    renderTime();
+}
 
-    if(lives != lastLives) {
+void HUD::renderLives() {
 
-        tft->fillRect(0, 0, 90, 30, TFT_BLACK);
+    if(!livesDirty) {
 
-        tft->drawString(
-            "VIDAS: " + String(lives),
-            5,
-            5,
-            2
-        );
-
-        lastLives = lives;
+        return;
     }
 
-    // =========================
-    // SCORE
-    // =========================
+    tft->fillRect(0, 0, 80, 30, TFT_BLACK);
 
-    if(score != lastScore) {
+    tft->setTextColor(TFT_RED);
 
-        tft->fillRect(95, 0, 120, 30, TFT_BLACK);
+    tft->drawString(
+        "HP: " + String(lives),
+        5,
+        5,
+        2
+    );
 
-        tft->drawString(
-            "PONTOS: " + String(score),
-            100,
-            5,
-            2
-        );
+    livesDirty = false;
+}
 
-        lastScore = score;
+void HUD::renderTime() {
+
+    if(!timeDirty) {
+
+        return;
     }
 
-    // =========================
-    // TEMPO
-    // =========================
+    // LIMPA SÓ ÁREA DO TEMPO
 
-    if(timeLeft != lastTime) {
+    tft->fillRect(240, 0, 80, 30, TFT_BLACK);
 
-        tft->fillRect(220, 0, 100, 30, TFT_BLACK);
+    tft->setTextColor(TFT_GREEN);
 
-        tft->drawString(
-            "TEMPO: " + String(timeLeft),
-            225,
-            5,
-            2
-        );
+    tft->drawRightString(
+        String(timeLeft),
+        310,
+        5,
+        2
+    );
 
-        lastTime = timeLeft;
-    }
+    timeDirty = false;
 }

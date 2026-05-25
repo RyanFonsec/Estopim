@@ -10,25 +10,25 @@ private:
 
     int lives;
 
-    int score;
-
     int timeLeft;
 
-    int lastLives;
+    bool livesDirty;
 
-    int lastScore;
+    bool timeDirty;
 
-    int lastTime;
 public:
 
     HUD(TFT_eSPI* display);
 
     void setLives(int value);
 
-    void setScore(int value);
-
     void setTime(int value);
 
     void render();
 
+private:
+
+    void renderLives();
+
+    void renderTime();
 };
