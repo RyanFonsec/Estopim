@@ -28,6 +28,10 @@ Level1Screen::Level1Screen(
 
     staticDrawn = false;
 
+    finished = false;
+
+    playerDead = false;
+
     questionDirty = true;
 
 }
@@ -59,6 +63,10 @@ void Level1Screen::generateQuestion() {
     levelState = LevelState::PLAYING;
 
     questionDirty = true;
+
+    finished = false;
+
+    playerDead = false;
 
     needsRender = true;
 }
@@ -146,6 +154,27 @@ void Level1Screen::update() {
             generateQuestion();
         }
     }
+
+    // =====================================
+    // GAME OVER CHECK
+    // =====================================
+
+    if(lives <= 0) {
+
+        finished = true;
+
+        playerDead = true;
+    }
+}
+
+bool Level1Screen::isFinished() {
+
+    return finished;
+}
+
+bool Level1Screen::isPlayerDead() {
+
+    return playerDead;
 }
 
 void Level1Screen::renderStatic() {

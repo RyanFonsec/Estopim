@@ -115,7 +115,7 @@ void Game::update() {
         // =====================
 
         case GameState::LEVEL1:
-
+        {
             // PAUSE
 
             if(input.wasPressed(Button::BTN_BLACK)) {
@@ -123,8 +123,22 @@ void Game::update() {
                 changeState(GameState::PAUSE);
             }
 
-         break;
+            Level1Screen* level =
 
+            static_cast<Level1Screen*>(
+                screenManager.getCurrentScreen()
+            );
+
+        if(level->isFinished()) {
+
+            if(level->isPlayerDead()) {
+
+                changeState(GameState::GAME_OVER);
+            }
+        }
+
+         break;
+        }
         // =====================
         // PAUSE
         // =====================

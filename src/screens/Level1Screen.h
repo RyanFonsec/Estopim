@@ -37,6 +37,10 @@ private:
 
     bool questionDirty;
 
+    bool finished;
+
+    bool playerDead;
+
     int lives;
 
     int score;
@@ -73,6 +77,10 @@ public:
     void update() override;
 
     void render() override;
+    
+    bool isFinished();
+
+    bool isPlayerDead();
 
     GameState getState() override;
 };
