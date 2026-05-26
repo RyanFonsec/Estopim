@@ -30,5 +30,5 @@ private:
 
     void renderLives();
 
-    void renderTime();
+    void renderTimeBar();
 };

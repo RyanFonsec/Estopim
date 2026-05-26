@@ -3,7 +3,6 @@
 #include "../math/MathGenerator.h"
 
 #include "../assets/backgrounds/level1_bg.h"
-
 #include "../assets/sprites/player_cannon.h"
 
 Level1Screen::Level1Screen(
@@ -26,24 +25,11 @@ Question Level1Screen::createQuestion() {
     return MathGenerator::generateEasyQuestion();
 }
 
-void Level1Screen::clearQuestionArea() {
-
-    tft->pushImage(
-        0,
-        130,
-        320,
-        120,
-        level1_bg + (130 * 320)
-    );
-}
-
 void Level1Screen::renderStatic() {
 
     tft->fillScreen(TFT_BLACK);
 
     tft->setSwapBytes(true);
-
-    // BACKGROUND
 
     tft->pushImage(
         0,
@@ -53,14 +39,38 @@ void Level1Screen::renderStatic() {
         level1_bg
     );
 
-    // PLAYER
-
     tft->pushImage(
         15,
-        80,
+        70,
         64,
         64,
         player_cannon,
         TFT_BLACK
     );
+}
+
+void Level1Screen::clearTimerArea() {
+
+    tft->pushImage(
+        0,
+        135,
+        320,
+        20,
+        level1_bg + (135 * 320)
+    );
+}
+
+void Level1Screen::clearQuestionArea() {
+
+    tft->pushImage(
+        0,
+        140,
+        320,
+        100,
+        level1_bg + (140 * 320)
+    );
+}
+
+void Level1Screen::renderGameplay() {
+
 }

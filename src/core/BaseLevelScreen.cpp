@@ -13,11 +13,11 @@ BaseLevelScreen::BaseLevelScreen(
 
     lives = 3;
 
-    score = 0;
-
     timeLeft = 15;
 
     staticDrawn = false;
+
+    hudDirty = true;
 
     questionDirty = true;
 
@@ -51,7 +51,7 @@ void BaseLevelScreen::generateQuestion() {
 
     questionDirty = true;
 
-    needsRender = true;
+    hudDirty = true;
 }
 
 void BaseLevelScreen::checkAnswer(int answerIndex) {
@@ -64,7 +64,7 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
     if(answerIndex ==
        currentQuestion.correctIndex) {
 
-        score += 100;
+        levelState = LevelState::CORRECT;
 
         feedback.success();
     }
@@ -72,29 +72,28 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
 
         lives--;
 
+        levelState = LevelState::WRONG;
+
         feedback.error();
+
+        hudDirty = true;
     }
 
     feedbackStart = millis();
-
-    levelState = LevelState::CORRECT;
-
-    if(answerIndex != currentQuestion.correctIndex) {
-
-        levelState = LevelState::WRONG;
-    }
 }
 
 void BaseLevelScreen::update() {
 
+    // =====================================
     // TIMER
+    // =====================================
 
     if(levelState == LevelState::PLAYING &&
-    timer.every(1000)) {
+       timer.every(1000)) {
 
         timeLeft--;
 
-        hud.setTime(timeLeft);
+        hudDirty = true;
 
         needsRender = true;
 
@@ -102,7 +101,7 @@ void BaseLevelScreen::update() {
 
             lives--;
 
-            hud.setLives(lives);
+            hudDirty = true;
 
             levelState = LevelState::TIMEOUT;
 
@@ -114,36 +113,49 @@ void BaseLevelScreen::update() {
         }
     }
 
+    // =====================================
     // INPUTS
+    // =====================================
 
-    if(levelState == LevelState::PLAYING && input->wasPressed(Button::BTN_GREEN)) {
+    if(levelState == LevelState::PLAYING) {
 
-        checkAnswer(0);
+        if(input->wasPressed(Button::BTN_GREEN)) {
+
+            checkAnswer(0);
+        }
+
+        if(input->wasPressed(Button::BTN_BLUE)) {
+
+            checkAnswer(1);
+        }
+
+        if(input->wasPressed(Button::BTN_YELLOW)) {
+
+            checkAnswer(2);
+        }
     }
 
-    if(levelState == LevelState::PLAYING &&
-       input->wasPressed(Button::BTN_BLUE)) {
-
-        checkAnswer(1);
-    }
-
-    if(levelState == LevelState::PLAYING &&
-       input->wasPressed(Button::BTN_YELLOW)) {
-
-        checkAnswer(2);
-    }
-
+    // =====================================
     // FEEDBACK TIMER
+    // =====================================
 
     if(levelState != LevelState::PLAYING) {
 
         if(millis() - feedbackStart > 1200) {
 
             generateQuestion();
+
+            questionDirty = true;
+
+            hudDirty = true;
+
+            needsRender = true;
         }
     }
 
+    // =====================================
     // GAME OVER
+    // =====================================
 
     if(lives <= 0) {
 
@@ -154,6 +166,11 @@ void BaseLevelScreen::update() {
 }
 
 void BaseLevelScreen::render() {
+
+    if(!needsRender) {
+
+        return;
+    }
 
     if(!staticDrawn) {
 
@@ -167,15 +184,26 @@ void BaseLevelScreen::render() {
     renderQuestion();
 
     renderGameplay();
+
+    needsRender = false;
 }
 
 void BaseLevelScreen::renderHUD() {
+
+    if(!hudDirty) {
+
+        return;
+    }
+
+    clearTimerArea();
 
     hud.setLives(lives);
 
     hud.setTime(timeLeft);
 
     hud.render();
+
+    hudDirty = false;
 }
 
 void BaseLevelScreen::renderQuestion() {
@@ -198,29 +226,27 @@ void BaseLevelScreen::renderQuestion() {
         + String(currentQuestion.num2)
         + " = ?";
 
-    tft->drawCentreString(
-        question,
-        160,
-        150,
-        4
+    tft->drawString(
+        "CALCULE " + question,
+        10,
+        165,
+        2
     );
 
     // VERDE
 
     tft->fillRect(
         10,
-        200,
+        195,
         90,
         30,
         TFT_GREEN
     );
 
-    tft->setTextColor(TFT_BLACK);
-
     tft->drawCentreString(
         String(currentQuestion.options[0]),
         55,
-        208,
+        203,
         2
     );
 
@@ -228,7 +254,7 @@ void BaseLevelScreen::renderQuestion() {
 
     tft->fillRect(
         115,
-        200,
+        195,
         90,
         30,
         TFT_BLUE
@@ -239,7 +265,7 @@ void BaseLevelScreen::renderQuestion() {
     tft->drawCentreString(
         String(currentQuestion.options[1]),
         160,
-        208,
+        203,
         2
     );
 
@@ -247,7 +273,7 @@ void BaseLevelScreen::renderQuestion() {
 
     tft->fillRect(
         220,
-        200,
+        195,
         90,
         30,
         TFT_YELLOW
@@ -258,15 +284,11 @@ void BaseLevelScreen::renderQuestion() {
     tft->drawCentreString(
         String(currentQuestion.options[2]),
         265,
-        208,
+        203,
         2
     );
 
     questionDirty = false;
-}
-
-void BaseLevelScreen::renderGameplay() {
-
 }
 
 bool BaseLevelScreen::isFinished() {

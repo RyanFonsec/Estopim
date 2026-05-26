@@ -19,5 +19,9 @@ protected:
 
     void renderStatic() override;
 
+    void renderGameplay() override;
+
     void clearQuestionArea() override;
+
+    void clearTimerArea() override;
 };

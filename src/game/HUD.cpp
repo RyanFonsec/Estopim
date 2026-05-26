@@ -1,5 +1,8 @@
 #include "HUD.h"
 
+#include "../assets/hud/heart_icon.h"
+#include "../assets/hud/player_icon.h"
+
 HUD::HUD(TFT_eSPI* display) {
 
     tft = display;
@@ -23,7 +26,6 @@ void HUD::setLives(int value) {
     }
 }
 
-
 void HUD::setTime(int value) {
 
     if(timeLeft != value) {
@@ -38,7 +40,7 @@ void HUD::render() {
 
     renderLives();
 
-    renderTime();
+    renderTimeBar();
 }
 
 void HUD::renderLives() {
@@ -48,38 +50,86 @@ void HUD::renderLives() {
         return;
     }
 
-    tft->fillRect(0, 0, 80, 30, TFT_BLACK);
-
-    tft->setTextColor(TFT_RED);
-
-    tft->drawString(
-        "HP: " + String(lives),
+    tft->pushImage(
         5,
-        5,
-        2
+        2,
+        24,
+        24,
+        player_icon,
+        TFT_BLACK
     );
+
+    for(int i = 0; i < lives; i++) {
+
+        tft->pushImage(
+            35 + (i * 18),
+            5,
+            16,
+            16,
+            heart_icon,
+            TFT_BLACK
+        );
+    }
 
     livesDirty = false;
 }
 
-void HUD::renderTime() {
+void HUD::renderTimeBar() {
 
     if(!timeDirty) {
 
         return;
     }
 
-    // LIMPA SÓ ÁREA DO TEMPO
 
-    tft->fillRect(240, 0, 80, 30, TFT_BLACK);
 
-    tft->setTextColor(TFT_GREEN);
+    // ============================================
+    // TEXTO TEMPO
+    // ============================================
+
+    tft->setTextColor(TFT_WHITE);
 
     tft->drawRightString(
-        String(timeLeft),
+        String(timeLeft) + " SEG",
         310,
-        5,
+        138,
         2
+    );
+
+    // ============================================
+    // BORDA BARRA
+    // ============================================
+
+    tft->drawRect(
+        10,
+        140,
+        220,
+        10,
+        TFT_WHITE
+    );
+
+    // ============================================
+    // TAMANHO BARRA
+    // ============================================
+
+    int width = map(
+        timeLeft,
+        0,
+        15,
+        0,
+        216
+    );
+
+    // ============================================
+    // BARRA VERDE
+    // ============================================
+
+    tft->fillRect(
+        12,
+        142,
+        width,
+        6,
+        TFT_GREEN
     );
 
     timeDirty = false;

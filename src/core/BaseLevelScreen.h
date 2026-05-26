@@ -7,12 +7,11 @@
 #include "../math/Question.h"
 
 #include "../game/HUD.h"
+#include "../game/LevelState.h"
 
 #include "../systems/InputSystem.h"
 #include "../systems/TimerSystem.h"
 #include "../systems/FeedbackSystem.h"
-
-#include "../game/LevelState.h"
 
 class BaseLevelScreen : public BaseScreen {
 
@@ -34,6 +33,8 @@ protected:
 
     bool staticDrawn;
 
+    bool hudDirty;
+
     bool questionDirty;
 
     bool finished;
@@ -41,8 +42,6 @@ protected:
     bool playerDead;
 
     int lives;
-
-    int score;
 
     int timeLeft;
 
@@ -55,13 +54,13 @@ public:
         InputSystem* in
     );
 
-    virtual void onEnter() override;
+    void onEnter() override;
 
-    virtual void onExit() override;
+    void onExit() override;
 
-    virtual void update() override;
+    void update() override;
 
-    virtual void render() override;
+    void render() override;
 
     bool isFinished();
 
@@ -73,9 +72,11 @@ protected:
 
     virtual void renderStatic() = 0;
 
+    virtual void renderGameplay() = 0;
+
     virtual void clearQuestionArea() = 0;
 
-    virtual void renderGameplay();
+    virtual void clearTimerArea() = 0;
 
     void generateQuestion();
 
