@@ -3,6 +3,7 @@
 #include "../screens/MenuScreen.h"
 #include "../screens/IntroScreen.h"
 #include "../screens/Level1Screen.h"
+#include "../screens/Level2Screen.h"
 #include "../screens/PauseScreen.h"
 #include "../screens/WinScreen.h"
 #include "../screens/GameOverScreen.h"
@@ -14,6 +15,7 @@ Game::Game(TFT_eSPI* display)
 : menuScreen(display),
   introScreen(display),
   level1Screen(display, &input),
+  level2Screen(display, &input),
   pauseScreen(display),
   winScreen(display),
   gameOverScreen(display)
@@ -45,6 +47,10 @@ void Game::changeState(GameState newState) {
         case GameState::LEVEL1:
             screenManager.setScreen(&level1Screen);
             break;
+        
+        case GameState::LEVEL2:
+            screenManager.setScreen(&level2Screen);
+            break;
 
         case GameState::PAUSE:
             screenManager.setScreen(&pauseScreen);
@@ -71,7 +77,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::MENU);
+    changeState(GameState::LEVEL2);
 }
 
 // =====================================
@@ -139,6 +145,37 @@ void Game::update() {
 
          break;
         }
+
+        // =====================
+        // LEVEL2
+        // =====================
+
+        case GameState::LEVEL2:
+        {
+            // PAUSE
+
+            if(input.wasPressed(Button::BTN_BLACK)) {
+
+                changeState(GameState::PAUSE);
+            }
+
+            Level2Screen* level =
+
+            static_cast<Level2Screen*>(
+                screenManager.getCurrentScreen()
+            );
+
+        if(level->isFinished()) {
+
+            if(level->isPlayerDead()) {
+
+                changeState(GameState::GAME_OVER);
+            }
+        }
+
+         break;
+        }
+
         // =====================
         // PAUSE
         // =====================

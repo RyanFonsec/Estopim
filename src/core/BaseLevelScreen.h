@@ -74,6 +74,8 @@ protected:
 
     virtual void renderGameplay() = 0;
 
+    virtual void clearGameplayArea() = 0;
+
     virtual void clearQuestionArea() = 0;
 
     virtual void clearTimerArea() = 0;

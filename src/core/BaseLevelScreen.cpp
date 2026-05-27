@@ -184,7 +184,7 @@ void BaseLevelScreen::render() {
     renderQuestion();
 
     renderGameplay();
-
+    
     needsRender = false;
 }
 

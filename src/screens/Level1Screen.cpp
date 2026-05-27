@@ -71,6 +71,20 @@ void Level1Screen::clearQuestionArea() {
     );
 }
 
+void Level1Screen::clearGameplayArea() {
+
+    tft->pushImage(
+        90,
+        40,
+        0,
+        0,
+        level1_bg + (40 * 320) + 90
+    );
+}
+
+
 void Level1Screen::renderGameplay() {
 
+    clearGameplayArea();
 }
+
