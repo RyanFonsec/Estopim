@@ -2,6 +2,7 @@
 
 #include "../assets/hud/heart_icon.h"
 #include "../assets/hud/player_icon.h"
+#include "../assets/backgrounds/level1_bg.h"
 
 HUD::HUD(TFT_eSPI* display) {
 
@@ -49,6 +50,14 @@ void HUD::renderLives() {
 
         return;
     }
+
+        tft->pushImage(
+        0,
+        0,
+        120,
+        30,
+        level1_bg
+    );
 
     tft->pushImage(
         5,

@@ -90,7 +90,7 @@
       "top": 192,
       "left": 201.6,
       "rotate": 180,
-      "attrs": { "volume": "5" }
+      "attrs": { "volume": "0.1" }
     },
     {
       "type": "wokwi-resistor",
