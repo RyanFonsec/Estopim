@@ -12,7 +12,14 @@ Level1Screen::Level1Screen(
 
 : BaseLevelScreen(display, in)
 {
+    correctAnswers = 0;
+}
 
+void Level1Screen::onEnter() {
+
+    BaseLevelScreen::onEnter();
+
+    correctAnswers = 0;
 }
 
 GameState Level1Screen::getState() {
@@ -23,6 +30,23 @@ GameState Level1Screen::getState() {
 Question Level1Screen::createQuestion() {
 
     return MathGenerator::generateEasyQuestion();
+}
+
+void Level1Screen::checkAnswer(int index) {
+
+    // reutiliza lógica original
+    BaseLevelScreen::checkAnswer(index);
+
+    // se acertou
+    if(lastAnswerCorrect) {
+
+        correctAnswers++;
+
+        if(correctAnswers >= 5) {
+
+            finished = true;
+        }
+    }
 }
 
 void Level1Screen::renderStatic() {

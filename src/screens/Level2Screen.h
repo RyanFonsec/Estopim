@@ -53,4 +53,6 @@ protected:
     void clearTimerArea() override;
 
     void renderGameplay() override;
+
+    void checkAnswer(int index) override;
 };

@@ -4,6 +4,10 @@
 
 class Level1Screen : public BaseLevelScreen {
 
+private:
+
+    int correctAnswers;
+
 public:
 
     Level1Screen(
@@ -27,4 +31,7 @@ protected:
 
     void renderGameplay() override;
 
+    void checkAnswer(int index) override;
+
+    void onEnter() override;
 };

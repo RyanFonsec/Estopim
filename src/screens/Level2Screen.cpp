@@ -361,3 +361,8 @@ void Level2Screen::clearQuestionArea() {
         TFT_DARKGREY
     );
 }
+
+void Level2Screen::checkAnswer(int index) {
+
+    checkEnemyAnswer(index);
+}

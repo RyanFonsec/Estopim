@@ -68,6 +68,8 @@ public:
 
 protected:
 
+    bool lastAnswerCorrect;
+
     virtual Question createQuestion() = 0;
 
     virtual void renderStatic() = 0;
@@ -80,11 +82,12 @@ protected:
 
     virtual void clearTimerArea() = 0;
 
+    virtual void checkAnswer(int index) = 0;
+    
     void generateQuestion();
-
-    void checkAnswer(int answerIndex);
 
     void renderHUD();
 
     void renderQuestion();
+
 };

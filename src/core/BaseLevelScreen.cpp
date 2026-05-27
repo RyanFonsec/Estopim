@@ -67,6 +67,8 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
         levelState = LevelState::CORRECT;
 
         feedback.success();
+
+        lastAnswerCorrect = true;
     }
     else {
 
@@ -77,6 +79,8 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
         feedback.error();
 
         hudDirty = true;
+
+        lastAnswerCorrect = false;
     }
 
     feedbackStart = millis();

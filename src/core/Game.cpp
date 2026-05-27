@@ -77,7 +77,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::LEVEL2);
+    changeState(GameState::LEVEL1);
 }
 
 // =====================================
@@ -135,13 +135,17 @@ void Game::update() {
                 screenManager.getCurrentScreen()
             );
 
-        if(level->isFinished()) {
+            if(level->isFinished()) {
 
-            if(level->isPlayerDead()) {
+                if(level->isPlayerDead()) {
 
-                changeState(GameState::GAME_OVER);
+                    changeState(GameState::GAME_OVER);
+                }
+                else {
+
+                    changeState(GameState::LEVEL2);
+                }
             }
-        }
 
          break;
         }
