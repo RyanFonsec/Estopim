@@ -77,7 +77,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::LEVEL1);
+    changeState(GameState::LEVEL2);
 }
 
 // =====================================

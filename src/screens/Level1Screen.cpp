@@ -19,6 +19,8 @@ void Level1Screen::onEnter() {
 
     BaseLevelScreen::onEnter();
 
+    hud.setBackground(level1_bg);
+    
     correctAnswers = 0;
 }
 

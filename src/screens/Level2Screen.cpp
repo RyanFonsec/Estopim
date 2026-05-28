@@ -2,9 +2,9 @@
 
 #include "../math/MathGenerator.h"
 
-//#include "../assets/backgrounds/level2_bg.h"
+#include "../assets/backgrounds/level2_bg.h"
 
-//#include "../assets/sprites/enemy1.h"
+#include "../assets/sprites/enemy1.h"
 
 #include "../assets/sprites/player_cannon.h"
 
@@ -39,6 +39,8 @@ void Level2Screen::onEnter() {
     hudDirty = true;
 
     feedback.begin();
+
+    hud.setBackground(level2_bg);
 }
 
 
@@ -55,7 +57,7 @@ Question Level2Screen::createQuestion() {
 void Level2Screen::renderStatic(){
 
     tft->setSwapBytes(true);
-/*
+
     tft->pushImage(
         0,
         0,
@@ -63,9 +65,6 @@ void Level2Screen::renderStatic(){
         240,
         level2_bg
     );
-*/
-
-tft->fillScreen(TFT_DARKGREY);
 
     // ============================================
     // PLAYER
@@ -81,7 +80,19 @@ tft->fillScreen(TFT_DARKGREY);
     );
 }
 
-/*void Level2Screen::clearGameplayArea() {
+void Level2Screen::renderPlayer() {
+
+    tft->pushImage(
+        10,
+        80,
+        64,
+        64,
+        player_cannon,
+        TFT_BLACK
+    );
+}
+
+void Level2Screen::clearGameplayArea() {
 
     tft->pushImage(
         0,
@@ -91,7 +102,7 @@ tft->fillScreen(TFT_DARKGREY);
         level2_bg + (40 * 320)
     );
 }
-*/
+
 
 void Level2Screen::spawnEnemy() {
 
@@ -101,7 +112,7 @@ void Level2Screen::spawnEnemy() {
 
             enemies[i].active = true;
 
-            enemies[i].x = -40;
+            enemies[i].x = 0;
 
             enemies[i].y = 70;
 
@@ -109,7 +120,6 @@ void Level2Screen::spawnEnemy() {
 
             enemies[i].question =
                 MathGenerator::generateSubtractionQuestion();
-
             break;
         }
     }
@@ -152,21 +162,14 @@ void Level2Screen::renderEnemies() {
             continue;
         }
 
-        /*tft->pushImage(
+        tft->pushImage(
             enemies[i].x,
             enemies[i].y,
             32,
             32,
             enemy1,
             TFT_BLACK
-        );*/
-        tft->fillRect(
-    enemies[i].x,
-    enemies[i].y,
-    32,
-    32,
-    TFT_RED
-);
+        );
     }
 }
 
@@ -324,41 +327,33 @@ void Level2Screen::renderGameplay() {
 
     clearGameplayArea();
 
+    renderPlayer();
+
     renderEnemies();
 
     renderOperations();
 }
 
-void Level2Screen::clearGameplayArea() {
-
-    tft->fillRect(
-        0,
-        40,
-        320,
-        100,
-        TFT_DARKGREY
-    );
-}
 
 void Level2Screen::clearTimerArea() {
 
-    tft->fillRect(
+    tft->pushImage(
         0,
         140,
         320,
         20,
-        TFT_DARKGREY
+        level2_bg + (140 * 320)
     );
 }
 
 void Level2Screen::clearQuestionArea() {
 
-    tft->fillRect(
+    tft->pushImage(
         0,
         160,
         320,
         80,
-        TFT_DARKGREY
+        level2_bg + (160 * 320)
     );
 }
 

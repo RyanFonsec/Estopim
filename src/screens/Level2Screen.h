@@ -46,6 +46,8 @@ protected:
 
     void renderStatic() override;
 
+    void renderPlayer();
+
     void clearQuestionArea() override;
 
     void clearGameplayArea() override;

@@ -16,6 +16,8 @@ private:
 
     bool timeDirty;
 
+    const uint16_t* currentBg;
+
 public:
 
     HUD(TFT_eSPI* display);
@@ -23,6 +25,8 @@ public:
     void setLives(int value);
 
     void setTime(int value);
+
+    void setBackground(const uint16_t* bg);
 
     void render();
 

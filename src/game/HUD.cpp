@@ -8,12 +8,12 @@ HUD::HUD(TFT_eSPI* display) {
 
     tft = display;
 
-    lives = -1;
+    currentBg = nullptr;
 
+    lives = -1;
     timeLeft = -1;
 
     livesDirty = true;
-
     timeDirty = true;
 }
 
@@ -56,7 +56,7 @@ void HUD::renderLives() {
         0,
         90,
         17,
-        level1_bg
+        currentBg
     );
 
     tft->pushImage(
@@ -142,4 +142,9 @@ void HUD::renderTimeBar() {
     );
 
     timeDirty = false;
+}
+
+void HUD::setBackground(const uint16_t* bg) {
+
+    currentBg = bg;
 }
