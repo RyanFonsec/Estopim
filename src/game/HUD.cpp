@@ -54,8 +54,8 @@ void HUD::renderLives() {
         tft->pushImage(
         0,
         0,
-        120,
-        30,
+        90,
+        17,
         level1_bg
     );
 
