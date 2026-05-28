@@ -86,7 +86,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::INTROLV2);
+    changeState(GameState::MENU);
 }
 
 // =====================================

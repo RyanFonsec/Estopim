@@ -69,13 +69,18 @@ Question MathGenerator::generateSubtractionQuestion() {
         }
         else {
 
-            q.options[i] =
-                q.correctAnswer + random(-5, 6);
+            int wrongAnswer;
 
-            if(q.options[i] == q.correctAnswer) {
+            do {
 
-                q.options[i]++;
-            }
+                wrongAnswer =
+                    q.correctAnswer + random(-5, 6);
+
+            } while(
+                wrongAnswer == q.correctAnswer
+            );
+
+            q.options[i] = wrongAnswer;
         }
     }
 

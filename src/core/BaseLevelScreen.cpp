@@ -171,7 +171,14 @@ void BaseLevelScreen::render() {
 
     renderHUD();
 
-    renderQuestion();
+    // =====================================
+    // SÓ DESENHA QUESTÃO SE HABILITADO
+    // =====================================
+
+    if(showQuestionUI) {
+
+        renderQuestion();
+    }
 
     renderGameplay();
 

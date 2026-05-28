@@ -70,6 +70,8 @@ protected:
 
     bool lastAnswerCorrect;
 
+    bool showQuestionUI = true;
+
     virtual Question createQuestion() = 0;
 
     virtual void renderStatic() = 0;
