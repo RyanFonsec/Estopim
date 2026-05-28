@@ -51,13 +51,13 @@ Question MathGenerator::generateSubtractionQuestion() {
 
     Question q;
 
-    q.num1 = random(1, 20);
+    q.num1 = random(5, 20);
 
     q.num2 = random(1, q.num1);
 
     q.operation = '-';
 
-    int correct = q.num1 - q.num2;
+    q.correctAnswer = q.num1 - q.num2;
 
     q.correctIndex = random(0, 3);
 
@@ -65,14 +65,14 @@ Question MathGenerator::generateSubtractionQuestion() {
 
         if(i == q.correctIndex) {
 
-            q.options[i] = correct;
+            q.options[i] = q.correctAnswer;
         }
         else {
 
             q.options[i] =
-                correct + random(-5, 5);
+                q.correctAnswer + random(-5, 6);
 
-            if(q.options[i] == correct) {
+            if(q.options[i] == q.correctAnswer) {
 
                 q.options[i]++;
             }

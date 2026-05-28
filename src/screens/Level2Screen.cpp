@@ -19,7 +19,6 @@ Level2Screen::Level2Screen(
 
     lastEnemySpawn = 0;
 
-
     for(int i = 0; i < MAX_ENEMIES; i++) {
 
         enemies[i].active = false;
@@ -28,21 +27,19 @@ Level2Screen::Level2Screen(
 
 void Level2Screen::onEnter() {
 
-    staticDrawn = false;
+    BaseLevelScreen::onEnter();
+
+    lives = 3;
 
     finished = false;
 
     playerDead = false;
 
-    lives = 3;
+    for(int i = 0; i < MAX_ENEMIES; i++) {
 
-    hudDirty = true;
-
-    feedback.begin();
-
-    hud.setBackground(level2_bg);
+        enemies[i].active = false;
+    }
 }
-
 
 GameState Level2Screen::getState() {
 
@@ -66,18 +63,7 @@ void Level2Screen::renderStatic(){
         level2_bg
     );
 
-    // ============================================
-    // PLAYER
-    // ============================================
-
-    tft->pushImage(
-        10,
-        80,
-        64,
-        64,
-        player_cannon,
-        TFT_BLACK
-    );
+    renderPlayer();
 }
 
 void Level2Screen::renderPlayer() {
@@ -95,14 +81,35 @@ void Level2Screen::renderPlayer() {
 void Level2Screen::clearGameplayArea() {
 
     tft->pushImage(
-        0,
+        80,
         40,
-        320,
+        240,
         100,
-        level2_bg + (40 * 320)
+        level2_bg + (40 * 320) + 80
     );
 }
 
+void Level2Screen::clearTimerArea() {
+
+    tft->pushImage(
+        0,
+        130,
+        320,
+        30,
+        level2_bg + (130 * 320)
+    );
+}
+
+void Level2Screen::clearQuestionArea() {
+
+    tft->pushImage(
+        0,
+        160,
+        320,
+        80,
+        level2_bg + (160 * 320)
+    );
+}
 
 void Level2Screen::spawnEnemy() {
 
@@ -112,7 +119,7 @@ void Level2Screen::spawnEnemy() {
 
             enemies[i].active = true;
 
-            enemies[i].x = 0;
+            enemies[i].x = 280;
 
             enemies[i].y = 70;
 
@@ -120,6 +127,7 @@ void Level2Screen::spawnEnemy() {
 
             enemies[i].question =
                 MathGenerator::generateSubtractionQuestion();
+
             break;
         }
     }
@@ -134,13 +142,9 @@ void Level2Screen::updateEnemies() {
             continue;
         }
 
-        enemies[i].x += enemies[i].speed;
+        enemies[i].x -= enemies[i].speed;
 
-        // ============================================
-        // PLAYER HIT
-        // ============================================
-
-        if(enemies[i].x >= 220) {
+        if(enemies[i].x <= 60) {
 
             enemies[i].active = false;
 
@@ -170,19 +174,8 @@ void Level2Screen::renderEnemies() {
             enemy1,
             TFT_BLACK
         );
-    }
-}
 
-void Level2Screen::renderOperations() {
-
-    tft->setTextColor(TFT_WHITE);
-
-    for(int i = 0; i < MAX_ENEMIES; i++) {
-
-        if(!enemies[i].active) {
-
-            continue;
-        }
+        tft->setTextColor(TFT_WHITE);
 
         String operation =
 
@@ -201,19 +194,10 @@ void Level2Screen::renderOperations() {
 
 void Level2Screen::removeEnemy(int index) {
 
-    for(int i = index; i < MAX_ENEMIES - 1; i++) {
-
-        enemies[i] = enemies[i + 1];
-    }
-
-    enemies[MAX_ENEMIES - 1].active = false;
+    enemies[index].active = false;
 }
 
 void Level2Screen::checkEnemyAnswer(int answerIndex) {
-
-    // ============================================
-    // PROCURA PRIMEIRO INIMIGO
-    // ============================================
 
     int firstEnemy = -1;
 
@@ -238,89 +222,35 @@ void Level2Screen::checkEnemyAnswer(int answerIndex) {
         feedback.success();
 
         removeEnemy(firstEnemy);
-
-        hudDirty = true;
     }
     else {
 
         lives--;
 
-        hudDirty = true;
-
         feedback.error();
     }
+
+    hudDirty = true;
+
+    needsRender = true;
 }
 
 void Level2Screen::update() {
 
     BaseLevelScreen::update();
-    
-    // ============================================
-    // TIMER DA FASE
-    // ============================================
-
-    if(timer.every(1000)) {
-
-        timeLeft--;
-
-        hudDirty = true;
-    }
-
-    // ============================================
-    // SPAWN DOS INIMIGOS
-    // ============================================
 
     if(millis() - lastEnemySpawn > spawnInterval) {
 
         spawnEnemy();
 
         lastEnemySpawn = millis();
-    }
 
-    // ============================================
-    // MOVIMENTAÇÃO
-    // ============================================
+        needsRender = true;
+    }
 
     updateEnemies();
 
-    // ============================================
-    // INPUTS
-    // ============================================
-
-    if(input->wasPressed(Button::BTN_GREEN)) {
-
-        checkEnemyAnswer(0);
-    }
-
-    if(input->wasPressed(Button::BTN_BLUE)) {
-
-        checkEnemyAnswer(1);
-    }
-
-    if(input->wasPressed(Button::BTN_YELLOW)) {
-
-        checkEnemyAnswer(2);
-    }
-
-    // ============================================
-    // GAME OVER
-    // ============================================
-
-    if(lives <= 0) {
-
-        finished = true;
-
-        playerDead = true;
-    }
-
-    // ============================================
-    // FASE COMPLETA
-    // ============================================
-
-    if(timeLeft <= 0) {
-
-        finished = true;
-    }
+    needsRender = true;
 }
 
 void Level2Screen::renderGameplay() {
@@ -330,31 +260,6 @@ void Level2Screen::renderGameplay() {
     renderPlayer();
 
     renderEnemies();
-
-    renderOperations();
-}
-
-
-void Level2Screen::clearTimerArea() {
-
-    tft->pushImage(
-        0,
-        140,
-        320,
-        20,
-        level2_bg + (140 * 320)
-    );
-}
-
-void Level2Screen::clearQuestionArea() {
-
-    tft->pushImage(
-        0,
-        160,
-        320,
-        80,
-        level2_bg + (160 * 320)
-    );
 }
 
 void Level2Screen::checkAnswer(int index) {

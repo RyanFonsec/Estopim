@@ -24,6 +24,8 @@ BaseLevelScreen::BaseLevelScreen(
     finished = false;
 
     playerDead = false;
+
+    needsRender = true;
 }
 
 void BaseLevelScreen::onEnter() {
@@ -31,6 +33,8 @@ void BaseLevelScreen::onEnter() {
     feedback.begin();
 
     generateQuestion();
+
+    staticDrawn = false;
 
     needsRender = true;
 }
@@ -52,6 +56,8 @@ void BaseLevelScreen::generateQuestion() {
     questionDirty = true;
 
     hudDirty = true;
+
+    needsRender = true;
 }
 
 void BaseLevelScreen::checkAnswer(int answerIndex) {
@@ -84,13 +90,11 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
     }
 
     feedbackStart = millis();
+
+    needsRender = true;
 }
 
 void BaseLevelScreen::update() {
-
-    // =====================================
-    // TIMER
-    // =====================================
 
     if(levelState == LevelState::PLAYING &&
        timer.every(1000)) {
@@ -117,10 +121,6 @@ void BaseLevelScreen::update() {
         }
     }
 
-    // =====================================
-    // INPUTS
-    // =====================================
-
     if(levelState == LevelState::PLAYING) {
 
         if(input->wasPressed(Button::BTN_GREEN)) {
@@ -139,27 +139,13 @@ void BaseLevelScreen::update() {
         }
     }
 
-    // =====================================
-    // FEEDBACK TIMER
-    // =====================================
-
     if(levelState != LevelState::PLAYING) {
 
         if(millis() - feedbackStart > 1200) {
 
             generateQuestion();
-
-            questionDirty = true;
-
-            hudDirty = true;
-
-            needsRender = true;
         }
     }
-
-    // =====================================
-    // GAME OVER
-    // =====================================
 
     if(lives <= 0) {
 
@@ -188,7 +174,7 @@ void BaseLevelScreen::render() {
     renderQuestion();
 
     renderGameplay();
-    
+
     needsRender = false;
 }
 
@@ -237,8 +223,6 @@ void BaseLevelScreen::renderQuestion() {
         2
     );
 
-    // VERDE
-
     tft->fillRect(
         10,
         195,
@@ -253,8 +237,6 @@ void BaseLevelScreen::renderQuestion() {
         203,
         2
     );
-
-    // AZUL
 
     tft->fillRect(
         115,
@@ -272,8 +254,6 @@ void BaseLevelScreen::renderQuestion() {
         203,
         2
     );
-
-    // AMARELO
 
     tft->fillRect(
         220,

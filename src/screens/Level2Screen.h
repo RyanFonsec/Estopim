@@ -27,6 +27,8 @@ private:
 
     void checkEnemyAnswer(int answerIndex);
 
+    void renderPlayer();
+
 public:
 
     Level2Screen(
@@ -37,7 +39,7 @@ public:
     GameState getState() override;
 
     void onEnter() override;
-    
+
     void update() override;
 
 protected:
@@ -46,15 +48,13 @@ protected:
 
     void renderStatic() override;
 
-    void renderPlayer();
-
     void clearQuestionArea() override;
 
     void clearGameplayArea() override;
 
     void clearTimerArea() override;
 
-    void renderGameplay() override;
+    void renderGameplay();
 
     void checkAnswer(int index) override;
 };

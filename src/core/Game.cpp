@@ -2,7 +2,9 @@
 
 #include "../screens/MenuScreen.h"
 #include "../screens/IntroScreen.h"
+#include "../screens/IntroLevel1Screen.h"
 #include "../screens/Level1Screen.h"
+#include "../screens/IntroLevel2Screen.h"
 #include "../screens/Level2Screen.h"
 #include "../screens/PauseScreen.h"
 #include "../screens/WinScreen.h"
@@ -14,7 +16,9 @@ Game::Game(TFT_eSPI* display)
 
 : menuScreen(display),
   introScreen(display),
+  introLevel1Screen(display),
   level1Screen(display, &input),
+  introLevel2Screen(display),
   level2Screen(display, &input),
   pauseScreen(display),
   winScreen(display),
@@ -43,11 +47,16 @@ void Game::changeState(GameState newState) {
         case GameState::INTRO:
             screenManager.setScreen(&introScreen);
             break;
-
+        
+        case GameState::INTROLV1:
+            screenManager.setScreen(&introLevel1Screen);
+            break;
         case GameState::LEVEL1:
             screenManager.setScreen(&level1Screen);
             break;
-        
+        case GameState::INTROLV2:
+            screenManager.setScreen(&introLevel2Screen);
+            break;
         case GameState::LEVEL2:
             screenManager.setScreen(&level2Screen);
             break;
@@ -77,7 +86,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::LEVEL2);
+    changeState(GameState::INTROLV2);
 }
 
 // =====================================
@@ -111,8 +120,21 @@ void Game::update() {
 
             if(input.wasPressed(Button::BTN_GREEN)) {
 
+                changeState(GameState::INTROLV1);
+            }
+
+        // =====================
+        // INTRO LEVEL 1
+        // =====================
+
+        case GameState::INTROLV1:
+
+            if(input.wasPressed(Button::BTN_GREEN)) {
+
                 changeState(GameState::LEVEL1);
             }
+
+            break;
 
             break;
 
@@ -143,12 +165,23 @@ void Game::update() {
                 }
                 else {
 
-                    changeState(GameState::LEVEL2);
+                    changeState(GameState::INTROLV2);
                 }
             }
 
          break;
         }
+
+        // =====================
+        // INTRO LEVEL 2
+        // =====================
+
+        case GameState::INTROLV2:
+
+            if(input.wasPressed(Button::BTN_GREEN)) {
+
+                changeState(GameState::LEVEL2);
+            }
 
         // =====================
         // LEVEL2

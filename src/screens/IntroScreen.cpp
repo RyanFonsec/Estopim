@@ -1,4 +1,5 @@
 #include "IntroScreen.h"
+#include "../assets/screen/Intro_screen.h"
 
 IntroScreen::IntroScreen(TFT_eSPI* display) {
 
@@ -25,27 +26,14 @@ GameState IntroScreen::getState() {
 
 void IntroScreen::render() {
 
-    tft->fillScreen(TFT_BLACK);
+    tft->setSwapBytes(true);
+    
+    tft->pushImage(
+        0,
+        0,
+        320,
+        240,
+        Intro_screen
+    );
 
-    // FUTURO:
-    // Sprite da narrativa
-    // tft->pushImage(...)
-
-    tft->setTextColor(TFT_YELLOW);
-
-    tft->drawCentreString("SALVADOR ESTA", 160, 20, 2);
-
-    tft->drawCentreString("EM PERIGO!", 160, 45, 2);
-
-    tft->setTextColor(TFT_WHITE);
-
-    tft->drawString("Resolva desafios", 20, 90, 2);
-
-    tft->drawString("matematicos para", 20, 115, 2);
-
-    tft->drawString("salvar a cidade.", 20, 140, 2);
-
-    tft->drawRect(40, 210, 240, 25, TFT_GREEN);
-
-    tft->drawCentreString("VERDE = CONTINUAR", 160, 216, 2);
 }
