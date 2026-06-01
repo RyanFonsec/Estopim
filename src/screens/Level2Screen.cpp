@@ -1,620 +1,266 @@
 #include "Level2Screen.h"
-
 #include "../math/MathGenerator.h"
-
 #include "../assets/backgrounds/level2_bg.h"
 #include "../assets/sprites/enemy1.h"
 #include "../assets/sprites/player_knife1.h"
 
-// ======================================================
-// BUFFER RESTORE BG
-// ======================================================
-
-static uint16_t bgLineBuffer[320];
-
-// ======================================================
-// RESTORE BACKGROUND
-// ======================================================
-
-static void restoreBg(
-    TFT_eSPI* tft,
-    const uint16_t* bg,
-    int x,
-    int y,
-    int w,
-    int h
-) {
-
-    // ==========================================
-    // CLAMP TELA
-    // ==========================================
-
-    if(x < 0) {
-
-        w += x;
-
-        x = 0;
-    }
-
-    if(y < 0) {
-
-        h += y;
-
-        y = 0;
-    }
-
-    if(x + w > 320) {
-
-        w = 320 - x;
-    }
-
-    if(y + h > 240) {
-
-        h = 240 - y;
-    }
-
-    if(w <= 0 || h <= 0) {
-
-        return;
-    }
-
-    // ==========================================
-    // JANELA TFT
-    // ==========================================
-
-    tft->setAddrWindow(
-        x,
-        y,
-        w,
-        h
-    );
-
-    // ==========================================
-    // RESTAURA LINHA A LINHA
-    // ==========================================
-
-    for(int row = 0; row < h; row++) {
-
-        const uint16_t* src =
-
-            bg
-            + ((y + row) * 320)
-            + x;
-
-        memcpy_P(
-            bgLineBuffer,
-            src,
-            w * sizeof(uint16_t)
-        );
-
-        tft->pushColors(
-            bgLineBuffer,
-            w,
-            true
-        );
-    }
-}
-
-// ======================================================
-// CONSTRUTOR
-// ======================================================
-
-Level2Screen::Level2Screen(
-    TFT_eSPI* display,
-    InputSystem* input
-)
-
-: BaseLevelScreen(display, input)
+Level2Screen::Level2Screen(TFT_eSPI* display, InputSystem* input)
+    : BaseLevelScreen(display, input),
+      enemySprite(display)
 {
-    spawnInterval = 3000;
-
+    spawnInterval  = 3000;
     lastEnemySpawn = 0;
+    lastMove       = 0;
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
-
+    for (int i = 0; i < MAX_ENEMIES; i++)
         enemies[i].active = false;
-    }
+
+    // SPR_W + MAX_SPEED garante espaço para o drift
+    // sem recriar o sprite a cada frame
+    enemySprite.createSprite(SPR_W + MAX_SPEED, SPR_H);
+    enemySprite.setSwapBytes(true);
 }
 
-// ======================================================
-// ON ENTER
-// ======================================================
+Level2Screen::~Level2Screen() {
+    enemySprite.deleteSprite();
+}
 
 void Level2Screen::onEnter() {
 
     feedback.begin();
-
     hud.setBackground(level2_bg);
 
-    lives = 3;
-
-    timeLeft = 15;
-
-    finished = false;
-
-    playerDead = false;
-
-    staticDrawn = false;
-
-    hudDirty = true;
-
-    needsRender = true;
-
+    lives          = 3;
+    timeLeft       = 15;
+    finished       = false;
+    playerDead     = false;
+    staticDrawn    = false;
+    hudDirty       = true;
+    needsRender    = true;
     lastEnemySpawn = 0;
+    lastMove       = 0;
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
-
+    for (int i = 0; i < MAX_ENEMIES; i++)
         enemies[i].active = false;
-    }
 }
 
-// ======================================================
-// GAME STATE
-// ======================================================
-
-GameState Level2Screen::getState() {
-
-    return GameState::LEVEL2;
-}
-
-// ======================================================
-// QUESTION
-// ======================================================
+GameState Level2Screen::getState() { return GameState::LEVEL2; }
 
 Question Level2Screen::createQuestion() {
-
     return MathGenerator::generateSubtractionQuestion();
 }
 
-// ======================================================
-// STATIC RENDER
-// ======================================================
-
 void Level2Screen::renderStatic() {
-
     tft->setSwapBytes(true);
-
-    tft->pushImage(
-        0,
-        0,
-        320,
-        240,
-        level2_bg
-    );
-
+    tft->pushImage(0, 0, 320, 240, (uint16_t*)level2_bg);
     renderPlayer();
 }
 
-// ======================================================
-// PLAYER
-// ======================================================
-
 void Level2Screen::renderPlayer() {
-
-    tft->pushImage(
-        10,
-        96,
-        32,
-        32,
-        player_knife1,
-        TFT_BLACK
-    );
+    tft->pushImage(10, 96, 32, 32, (uint16_t*)player_knife1, TFT_BLACK);
 }
-
-// ======================================================
-// CLEARS
-// ======================================================
 
 void Level2Screen::clearGameplayArea() {
-
-    tft->pushImage(
-        50,
-        40,
-        270,
-        90,
-        level2_bg + (40 * 320) + 50
-    );
+    BgUtils::restore(tft, level2_bg, 50, 40, 270, 90);
 }
-
 void Level2Screen::clearTimerArea() {
-
-    tft->pushImage(
-        0,
-        130,
-        320,
-        30,
-        level2_bg + (130 * 320)
-    );
+    BgUtils::restore(tft, level2_bg, 0, 130, 320, 30);
 }
-
 void Level2Screen::clearQuestionArea() {
-
-    tft->pushImage(
-        0,
-        160,
-        320,
-        80,
-        level2_bg + (160 * 320)
-    );
+    BgUtils::restore(tft, level2_bg, 0, 160, 320, 80);
 }
 
-// ======================================================
-// SPAWN ENEMY
-// ======================================================
+// ─────────────────────────────────────────────────────
+// drawEnemy
+//
+// O sprite tem largura SPR_W + MAX_SPEED (ex: 65px para speed=1).
+// A cada frame:
+//   - bg é copiado cobrindo a posição NOVA + o rastro (drift px)
+//   - enemy é colado com transparência 0x0000 dentro do sprite
+//   - pushSprite SEM transparência → uma única escrita SPI
+//
+// Resultado: rastro coberto + sem flickering.
+// ─────────────────────────────────────────────────────
+void Level2Screen::drawEnemy(int index, int prevX) {
 
-void Level2Screen::spawnEnemy() {
+    int ex    = enemies[index].x;
+    int ey    = enemies[index].y;
+    int drift = prevX - ex;          // quanto andou (≥ 0, = speed quando moveu)
 
-    // ==========================================
-    // LIMITE
-    // ==========================================
+    // O sprite começa na posição nova menos a margem lateral
+    int sx   = ex - 16;
+    int sy   = ey - 22;
+    int sprW = SPR_W + drift;        // largura real usada este frame
+    int sprH = SPR_H;
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
+    // ── 1. Copia bg para o sprite linha a linha ───────
+    enemySprite.setSwapBytes(true);
 
-        if(enemies[i].active) {
+    int csx = sx,    csy = sy;
+    int csw = sprW,  csh = sprH;
 
-            return;
-        }
+    // Clamp para não sair da tela
+    if (csx < 0)         { csw += csx; csx = 0; }
+    if (csy < 0)         { csh += csy; csy = 0; }
+    if (csx + csw > 320)   csw = 320 - csx;
+    if (csy + csh > 240)   csh = 240 - csy;
+    if (csw <= 0 || csh <= 0) return;
+
+    for (int row = 0; row < csh; row++) {
+        uint16_t lineBuf[SPR_W + MAX_SPEED];
+        memcpy_P(lineBuf,
+                 level2_bg + ((csy + row) * 320) + csx,
+                 csw * sizeof(uint16_t));
+
+        // x dentro do sprite: 0 quando sx >= 0, ou -sx quando cortado
+        enemySprite.pushImage(csx - sx, row, csw, 1, lineBuf);
     }
 
-    // ==========================================
-    // SPAWN
-    // ==========================================
-
-    for(int i = 0; i < MAX_ENEMIES; i++) {
-
-        if(!enemies[i].active) {
-
-            Question q =
-
-                MathGenerator::
-                generateSubtractionQuestion();
-
-            enemies[i].active = true;
-
-            enemies[i].x = 280;
-
-            enemies[i].y = 96;
-
-            enemies[i].speed = 2;
-
-            enemies[i].question = q;
-
-            currentQuestion = q;
-
-            questionDirty = true;
-
-            needsRender = true;
-
-            break;
-        }
-    }
-}
-
-// ======================================================
-// STEP + DRAW
-// ======================================================
-
-static const int GHOST_X_PAD = 16;
-
-static const int GHOST_Y_TOP = 22;
-
-static const int SPRITE_W = 32;
-
-static const int SPRITE_H = 32;
-
-void Level2Screen::stepAndDrawEnemies() {
-
-    tft->setSwapBytes(true);
-
-    tft->setTextColor(
-        TFT_WHITE,
-        0x0000
+    // ── 2. Cola o inimigo por cima ────────────────────
+    // xPos dentro do sprite = sempre 16 (margem esquerda fixa)
+    // porque sx = ex - 16, logo ex - sx = 16
+    enemySprite.pushImage(
+        16, 22,
+        32, 32,
+        (uint16_t*)enemy1,
+        (uint16_t)0x0000    // transparência só em RAM, sem custo SPI
     );
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
+    // ── 3. Texto ──────────────────────────────────────
+    String op = String(enemies[index].question.num1)
+              + "-"
+              + String(enemies[index].question.num2);
 
-        if(!enemies[i].active) {
+    enemySprite.setTextColor(TFT_WHITE);
+    enemySprite.drawCentreString(op, 32, 2, 2); // centro do inimigo = 16+16
 
-            continue;
-        }
-
-        // ======================================
-        // POSIÇÃO ANTIGA
-        // ======================================
-
-        int px = enemies[i].x;
-
-        int py = enemies[i].y;
-
-        // ======================================
-        // LIMPA GHOST
-        // ======================================
-
-        restoreBg(
-            tft,
-            level2_bg,
-            px - GHOST_X_PAD,
-            py - GHOST_Y_TOP,
-            SPRITE_W + (GHOST_X_PAD * 2),
-            SPRITE_H + GHOST_Y_TOP
-        );
-
-        // ======================================
-        // MOVE
-        // ======================================
-
-        enemies[i].x -= enemies[i].speed;
-
-        // ======================================
-        // PLAYER HIT
-        // ======================================
-
-        if(enemies[i].x <= 60) {
-
-            restoreBg(
-                tft,
-                level2_bg,
-                enemies[i].x - GHOST_X_PAD,
-                py - GHOST_Y_TOP,
-                SPRITE_W + (GHOST_X_PAD * 2),
-                SPRITE_H + GHOST_Y_TOP
-            );
-
-            enemies[i].active = false;
-
-            lives--;
-
-            hudDirty = true;
-
-            questionDirty = true;
-
-            needsRender = true;
-
-            feedback.error();
-
-            continue;
-        }
-
-        // ======================================
-        // NOVA POSIÇÃO
-        // ======================================
-
-        int nx = enemies[i].x;
-
-        // ======================================
-        // TEXTO
-        // ======================================
-
-        String operation =
-
-            String(enemies[i].question.num1)
-            + "-"
-            + String(enemies[i].question.num2);
-
-        tft->drawCentreString(
-            operation,
-            nx + 16,
-            py - GHOST_Y_TOP + 4,
-            2
-        );
-
-        // ======================================
-        // SPRITE
-        // ======================================
-
-        tft->pushImage(
-            nx,
-            py,
-            SPRITE_W,
-            SPRITE_H,
-            enemy1,
-            TFT_BLACK
-        );
-    }
+    // ── 4. Envia para a tela SEM transparência ────────
+    // O bg dentro do sprite já cobre o rastro.
+    // pushSprite sem 3º argumento = sem transparência = sem flickering.
+    enemySprite.pushSprite(sx, sy);
 }
 
-// ======================================================
-// STUBS
-// ======================================================
-
-void Level2Screen::updateEnemies() {
-
+void Level2Screen::eraseEnemy(int index) {
+    BgUtils::restore(
+        tft, level2_bg,
+        enemies[index].x - 16,
+        enemies[index].y - 22,
+        SPR_W + MAX_SPEED, SPR_H   // mesma largura do sprite
+    );
 }
-
-void Level2Screen::renderEnemies() {
-
-}
-
-// ======================================================
-// REMOVE ENEMY
-// ======================================================
 
 void Level2Screen::removeEnemy(int index) {
-
-    int px = enemies[index].x;
-
-    int py = enemies[index].y;
-
-    restoreBg(
-        tft,
-        level2_bg,
-        px - GHOST_X_PAD,
-        py - GHOST_Y_TOP,
-        SPRITE_W + (GHOST_X_PAD * 2),
-        SPRITE_H + GHOST_Y_TOP
-    );
-
+    eraseEnemy(index);
     enemies[index].active = false;
 }
 
-// ======================================================
-// CHECK ANSWER
-// ======================================================
+void Level2Screen::spawnEnemy() {
 
-void Level2Screen::checkEnemyAnswer(int answerIndex) {
+    for (int i = 0; i < MAX_ENEMIES; i++)
+        if (enemies[i].active) return;
 
-    int firstEnemy = -1;
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].active) {
+            Question q = MathGenerator::generateSubtractionQuestion();
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
+            enemies[i].active   = true;
+            enemies[i].x        = 280;
+            enemies[i].y        = 96;
+            enemies[i].speed    = MAX_SPEED;
+            enemies[i].question = q;
 
-        if(enemies[i].active) {
+            currentQuestion = q;
+            questionDirty   = true;
+            needsRender     = true;
 
-            firstEnemy = i;
-
+            renderHUD();
+            renderQuestion();
             break;
         }
     }
+}
 
-    if(firstEnemy == -1) {
+void Level2Screen::checkEnemyAnswer(int answerIndex) {
 
-        return;
-    }
+    int first = -1;
+    for (int i = 0; i < MAX_ENEMIES; i++)
+        if (enemies[i].active) { first = i; break; }
 
-    // ==========================================
-    // CORRETO
-    // ==========================================
+    if (first == -1) return;
 
-    if(answerIndex ==
-       enemies[firstEnemy].question.correctIndex) {
-
+    if (answerIndex == enemies[first].question.correctIndex) {
         feedback.success();
-
-        removeEnemy(firstEnemy);
-
+        removeEnemy(first);
         questionDirty = true;
-
-        needsRender = true;
-    }
-
-    // ==========================================
-    // ERRADO
-    // ==========================================
-
-    else {
-
+        needsRender   = true;
+    } else {
         lives--;
-
-        hudDirty = true;
-
+        hudDirty    = true;
         needsRender = true;
-
         feedback.error();
     }
 }
 
-void Level2Screen::checkAnswer(int index) {
-
-    checkEnemyAnswer(index);
-}
-
-// ======================================================
-// UPDATE
-// ======================================================
+void Level2Screen::checkAnswer(int index) { checkEnemyAnswer(index); }
 
 void Level2Screen::update() {
 
-    // ==========================================
-    // TIMER
-    // ==========================================
-
-    if(timer.every(1000)) {
-
+    if (timer.every(1000)) {
         timeLeft--;
-
-        hudDirty = true;
-
+        hudDirty    = true;
         needsRender = true;
     }
 
-    // ==========================================
-    // SPAWN
-    // ==========================================
-
-    if(millis() - lastEnemySpawn >
-       spawnInterval) {
-
+    if (millis() - lastEnemySpawn >= spawnInterval) {
         spawnEnemy();
-
         lastEnemySpawn = millis();
     }
 
-    // ==========================================
-    // MOVE + DRAW
-    // ==========================================
+    bool shouldMove = (millis() - lastMove >= MOVE_INTERVAL);
+    if (shouldMove) lastMove = millis();
 
-    stepAndDrawEnemies();
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].active) continue;
 
-    // ==========================================
-    // INPUTS
-    // ==========================================
+        int prevX = enemies[i].x;
 
-    if(input->wasPressed(Button::BTN_GREEN)) {
+        if (shouldMove)
+            enemies[i].x -= enemies[i].speed;
 
-        checkEnemyAnswer(0);
+        if (enemies[i].x <= 60) {
+            eraseEnemy(i);
+            enemies[i].active = false;
+            lives--;
+            hudDirty      = true;
+            questionDirty = true;
+            needsRender   = true;
+            feedback.error();
+        } else {
+            drawEnemy(i, prevX);
+        }
     }
 
-    if(input->wasPressed(Button::BTN_BLUE)) {
+    if (input->wasPressed(Button::BTN_GREEN))  checkEnemyAnswer(0);
+    if (input->wasPressed(Button::BTN_BLUE))   checkEnemyAnswer(1);
+    if (input->wasPressed(Button::BTN_YELLOW)) checkEnemyAnswer(2);
 
-        checkEnemyAnswer(1);
-    }
-
-    if(input->wasPressed(Button::BTN_YELLOW)) {
-
-        checkEnemyAnswer(2);
-    }
-
-    // ==========================================
-    // GAME OVER
-    // ==========================================
-
-    if(lives <= 0) {
-
-        finished = true;
-
-        playerDead = true;
-    }
-
-    // ==========================================
-    // WIN
-    // ==========================================
-
-    if(timeLeft <= 0) {
-
-        finished = true;
-    }
+    if (lives    <= 0) { finished = true; playerDead = true; }
+    if (timeLeft <= 0) { finished = true; }
 }
-
-// ======================================================
-// RENDER
-// ======================================================
 
 void Level2Screen::render() {
 
-    if(!needsRender) {
+    if (!needsRender) return;
 
-        return;
-    }
-
-    if(!staticDrawn) {
-
+    if (!staticDrawn) {
         renderStatic();
-
         staticDrawn = true;
     }
 
     renderHUD();
-
     renderQuestion();
 
     needsRender = false;
 }
 
-// ======================================================
-// GAMEPLAY
-// ======================================================
-
-void Level2Screen::renderGameplay() {
-
-    renderEnemies();
-}
-
+void Level2Screen::renderGameplay() {}
