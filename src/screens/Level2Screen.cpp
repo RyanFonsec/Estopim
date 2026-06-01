@@ -15,10 +15,7 @@ Level2Screen::Level2Screen(TFT_eSPI* display, InputSystem* input)
     for (int i = 0; i < MAX_ENEMIES; i++)
         enemies[i].active = false;
 
-    // SPR_W + MAX_SPEED garante espaço para o drift
-    // sem recriar o sprite a cada frame
     enemySprite.createSprite(SPR_W + MAX_SPEED, SPR_H);
-    enemySprite.setSwapBytes(true);
 }
 
 Level2Screen::~Level2Screen() {
@@ -26,7 +23,6 @@ Level2Screen::~Level2Screen() {
 }
 
 void Level2Screen::onEnter() {
-
     feedback.begin();
     hud.setBackground(level2_bg);
 
@@ -70,41 +66,32 @@ void Level2Screen::clearQuestionArea() {
     BgUtils::restore(tft, level2_bg, 0, 160, 320, 80);
 }
 
-// ─────────────────────────────────────────────────────
-// drawEnemy
-//
-// O sprite tem largura SPR_W + MAX_SPEED (ex: 65px para speed=1).
-// A cada frame:
-//   - bg é copiado cobrindo a posição NOVA + o rastro (drift px)
-//   - enemy é colado com transparência 0x0000 dentro do sprite
-//   - pushSprite SEM transparência → uma única escrita SPI
-//
-// Resultado: rastro coberto + sem flickering.
-// ─────────────────────────────────────────────────────
 void Level2Screen::drawEnemy(int index, int prevX) {
 
     int ex    = enemies[index].x;
     int ey    = enemies[index].y;
-    int drift = prevX - ex;          // quanto andou (≥ 0, = speed quando moveu)
+    int drift = prevX - ex;
 
-    // O sprite começa na posição nova menos a margem lateral
     int sx   = ex - 16;
     int sy   = ey - 22;
-    int sprW = SPR_W + drift;        // largura real usada este frame
+    int sprW = SPR_W + drift;
     int sprH = SPR_H;
 
-    // ── 1. Copia bg para o sprite linha a linha ───────
-    enemySprite.setSwapBytes(true);
+    int csx = sx,   csy = sy;
+    int csw = sprW, csh = sprH;
 
-    int csx = sx,    csy = sy;
-    int csw = sprW,  csh = sprH;
-
-    // Clamp para não sair da tela
     if (csx < 0)         { csw += csx; csx = 0; }
     if (csy < 0)         { csh += csy; csy = 0; }
     if (csx + csw > 320)   csw = 320 - csx;
     if (csy + csh > 240)   csh = 240 - csy;
     if (csw <= 0 || csh <= 0) return;
+
+    // ── 1. Copia bg para o sprite ─────────────────────
+    // setSwapBytes(false): o memcpy_P traz os bytes do PROGMEM
+    // já na ordem que o TFT espera. O sprite armazena como veio.
+    // Se usarmos true aqui, o sprite troca os bytes e quando
+    // pushSprite envia, troca de novo → cor errada → preto.
+enemySprite.setSwapBytes(true);
 
     for (int row = 0; row < csh; row++) {
         uint16_t lineBuf[SPR_W + MAX_SPEED];
@@ -112,19 +99,26 @@ void Level2Screen::drawEnemy(int index, int prevX) {
                  level2_bg + ((csy + row) * 320) + csx,
                  csw * sizeof(uint16_t));
 
-        // x dentro do sprite: 0 quando sx >= 0, ou -sx quando cortado
         enemySprite.pushImage(csx - sx, row, csw, 1, lineBuf);
     }
 
     // ── 2. Cola o inimigo por cima ────────────────────
-    // xPos dentro do sprite = sempre 16 (margem esquerda fixa)
-    // porque sx = ex - 16, logo ex - sx = 16
-    enemySprite.pushImage(
-        16, 22,
-        32, 32,
-        (uint16_t*)enemy1,
-        (uint16_t)0x0000    // transparência só em RAM, sem custo SPI
-    );
+    // setSwapBytes(true): enemy1 é PROGMEM RGB565 big-endian.
+    // O sprite precisa trocar os bytes ao ler para armazenar
+    // na ordem correta internamente.
+    
+    TFT_eSprite tempEnemy = TFT_eSprite(tft);
+    tempEnemy.createSprite(32, 32);
+    tempEnemy.setSwapBytes(false);
+    
+    // Carrega a imagem do inimigo no sprite temporário
+    tempEnemy.pushImage(0, 0, 32, 32, (uint16_t*)enemy1);
+    
+    // Usa pushToSprite, que APLICA a transparência (0x0000) corretamente na RAM!
+    tempEnemy.pushToSprite(&enemySprite, 16, 22, 0x0000);
+    
+    // Libera a memória
+    tempEnemy.deleteSprite();
 
     // ── 3. Texto ──────────────────────────────────────
     String op = String(enemies[index].question.num1)
@@ -132,11 +126,11 @@ void Level2Screen::drawEnemy(int index, int prevX) {
               + String(enemies[index].question.num2);
 
     enemySprite.setTextColor(TFT_WHITE);
-    enemySprite.drawCentreString(op, 32, 2, 2); // centro do inimigo = 16+16
+    enemySprite.drawCentreString(op, 32, 2, 2);
 
-    // ── 4. Envia para a tela SEM transparência ────────
-    // O bg dentro do sprite já cobre o rastro.
-    // pushSprite sem 3º argumento = sem transparência = sem flickering.
+    // ── 4. Envia para a tela ──────────────────────────
+    // SEM transparência — o bg dentro do sprite já está correto,
+    // cobre o rastro, zero flickering.
     enemySprite.pushSprite(sx, sy);
 }
 
@@ -145,7 +139,7 @@ void Level2Screen::eraseEnemy(int index) {
         tft, level2_bg,
         enemies[index].x - 16,
         enemies[index].y - 22,
-        SPR_W + MAX_SPEED, SPR_H   // mesma largura do sprite
+        SPR_W + MAX_SPEED, SPR_H
     );
 }
 
