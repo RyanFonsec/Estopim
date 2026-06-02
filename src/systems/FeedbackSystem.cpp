@@ -7,6 +7,8 @@ FeedbackSystem::FeedbackSystem() {
     bluePin = 13;
     buzzerPin = 17;
     buzzerChannel = 0;
+    feedbackStart = 0;
+    active = false;
 }
 
 void FeedbackSystem::begin() {
@@ -39,6 +41,10 @@ void FeedbackSystem::success() {
     digitalWrite(greenPin, LOW);
 
     ledcWriteTone(buzzerChannel, 1200);
+
+    active = true;
+
+    feedbackStart = millis();
 }
 
 void FeedbackSystem::error() {
@@ -48,6 +54,10 @@ void FeedbackSystem::error() {
     digitalWrite(redPin, LOW);
 
     ledcWriteTone(buzzerChannel, 300);
+
+    active = true;
+
+    feedbackStart = millis();
 }
 
 void FeedbackSystem::timeout() {
@@ -58,4 +68,21 @@ void FeedbackSystem::timeout() {
     digitalWrite(greenPin, LOW);
 
     ledcWriteTone(buzzerChannel, 700);
+
+    active = true;
+
+    feedbackStart = millis();
+}
+
+void FeedbackSystem::update() {
+
+    if(!active)
+        return;
+
+    if(millis() - feedbackStart >= 500) {
+
+        clear();
+
+        active = false;
+    }
 }

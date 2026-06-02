@@ -86,7 +86,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::LEVEL2);
+    changeState(GameState::INTROLV2);
 }
 
 // =====================================
@@ -179,7 +179,7 @@ void Game::update() {
         case GameState::INTROLV2:
 
             if(input.wasPressed(Button::BTN_GREEN)) {
-
+                tft->fillScreen(TFT_BLACK);
                 changeState(GameState::LEVEL2);
             }
 
@@ -235,7 +235,6 @@ void Game::update() {
     // =====================
 
     if(input.wasPressed(Button::BTN_WHITE)) {
-
         ESP.restart();
     }
 

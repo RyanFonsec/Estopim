@@ -14,11 +14,17 @@ private:
 
     int buzzerChannel;
 
+    unsigned long feedbackStart;
+
+    bool active;
+
 public:
 
     FeedbackSystem();
 
     void begin();
+
+    void update();
 
     void success();
 

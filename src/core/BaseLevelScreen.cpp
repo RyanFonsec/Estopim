@@ -40,7 +40,7 @@ void BaseLevelScreen::onEnter() {
 }
 
 void BaseLevelScreen::onExit() {
-
+    feedback.clear();
 }
 
 void BaseLevelScreen::generateQuestion() {
@@ -96,6 +96,8 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
 
 void BaseLevelScreen::update() {
 
+    feedback.update();
+    
     if(levelState == LevelState::PLAYING &&
        timer.every(1000)) {
 

@@ -31,8 +31,8 @@ protected:
 private:
 
     static const int MAX_ENEMIES   = 1;
-    static const int MAX_SPEED     = 1;   // pixels por passo — muda aqui para ajustar velocidade
-    static const int MOVE_INTERVAL = 40;  // ms entre passos — muda aqui para ajustar velocidade
+    static const int MAX_SPEED     = 3;   // pixels por passo — muda aqui para ajustar velocidade
+    static const int MOVE_INTERVAL = 20;  // ms entre passos — muda aqui para ajustar velocidade
     static const int SPR_W         = 64;  // 16px margem + 32px sprite + 16px margem
     static const int SPR_H         = 54;  // 22px texto   + 32px sprite
 

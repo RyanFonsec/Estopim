@@ -24,15 +24,23 @@ Level2Screen::~Level2Screen() {
 
 void Level2Screen::onEnter() {
     feedback.begin();
+    feedback.clear();
+
     hud.setBackground(level2_bg);
 
     lives          = 3;
     timeLeft       = 15;
     finished       = false;
     playerDead     = false;
+
     staticDrawn    = false;
+
     hudDirty       = true;
+    questionDirty  = true;
     needsRender    = true;
+
+    feedbackStart  = 0;
+
     lastEnemySpawn = 0;
     lastMove       = 0;
 
@@ -167,8 +175,7 @@ void Level2Screen::spawnEnemy() {
             questionDirty   = true;
             needsRender     = true;
 
-            renderHUD();
-            renderQuestion();
+
             break;
         }
     }
@@ -184,20 +191,30 @@ void Level2Screen::checkEnemyAnswer(int answerIndex) {
 
     if (answerIndex == enemies[first].question.correctIndex) {
         feedback.success();
+        feedbackStart = millis();
         removeEnemy(first);
         questionDirty = true;
         needsRender   = true;
     } else {
+        feedback.error();
+        feedbackStart = millis();
         lives--;
         hudDirty    = true;
         needsRender = true;
-        feedback.error();
+        
     }
 }
 
 void Level2Screen::checkAnswer(int index) { checkEnemyAnswer(index); }
 
 void Level2Screen::update() {
+
+
+    if (feedbackStart > 0 && millis() - feedbackStart >= 300) {
+
+        feedback.clear();
+        feedbackStart = 0;
+    }
 
     if (timer.every(1000)) {
         timeLeft--;
@@ -229,6 +246,7 @@ void Level2Screen::update() {
             questionDirty = true;
             needsRender   = true;
             feedback.error();
+            feedbackStart = millis();
         } else {
             drawEnemy(i, prevX);
         }
@@ -239,7 +257,7 @@ void Level2Screen::update() {
     if (input->wasPressed(Button::BTN_YELLOW)) checkEnemyAnswer(2);
 
     if (lives    <= 0) { finished = true; playerDead = true; }
-    if (timeLeft <= 0) { finished = true; }
+    if (timeLeft <= 0) { finished = true;     feedback.timeout(); feedbackStart = millis();}
 }
 
 void Level2Screen::render() {
@@ -257,4 +275,12 @@ void Level2Screen::render() {
     needsRender = false;
 }
 
-void Level2Screen::renderGameplay() {}
+void Level2Screen::renderGameplay() {
+    renderHUD();
+
+    renderQuestion();
+
+    renderGameplay();
+
+    needsRender = false;
+}
