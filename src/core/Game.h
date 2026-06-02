@@ -15,6 +15,8 @@
 #include "../screens/Level1Screen.h"
 #include "../screens/IntroLevel2Screen.h"
 #include "../screens/Level2Screen.h"
+#include "../screens/IntroLevel3Screen.h"
+#include "../screens/IntroLevel4Screen.h"
 #include "../screens/PauseScreen.h"
 #include "../screens/WinScreen.h"
 #include "../screens/GameOverScreen.h"
@@ -51,6 +53,10 @@ private:
     IntroLevel2Screen introLevel2Screen;
 
     Level2Screen level2Screen;
+
+    IntroLevel3Screen introLevel3Screen;
+
+    IntroLevel4Screen introLevel4Screen;
 
     PauseScreen pauseScreen;
 

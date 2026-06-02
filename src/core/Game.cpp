@@ -1,18 +1,5 @@
 #include "Game.h"
 
-#include "../screens/MenuScreen.h"
-#include "../screens/TutorialScreen.h"
-#include "../screens/IntroScreen.h"
-#include "../screens/IntroLevel1Screen.h"
-#include "../screens/Level1Screen.h"
-#include "../screens/IntroLevel2Screen.h"
-#include "../screens/Level2Screen.h"
-#include "../screens/PauseScreen.h"
-#include "../screens/WinScreen.h"
-#include "../screens/GameOverScreen.h"
-#include "../systems/FeedbackSystem.h"
-
-
 Game::Game(TFT_eSPI* display)
 
 : menuScreen(display),
@@ -22,6 +9,8 @@ Game::Game(TFT_eSPI* display)
   level1Screen(display, &input),
   introLevel2Screen(display),
   level2Screen(display, &input),
+  introLevel3Screen(display),
+  introLevel4Screen(display),
   pauseScreen(display),
   winScreen(display),
   gameOverScreen(display)
@@ -57,14 +46,25 @@ void Game::changeState(GameState newState) {
         case GameState::INTROLV1:
             screenManager.setScreen(&introLevel1Screen);
             break;
+
         case GameState::LEVEL1:
             screenManager.setScreen(&level1Screen);
             break;
+
         case GameState::INTROLV2:
             screenManager.setScreen(&introLevel2Screen);
             break;
+
         case GameState::LEVEL2:
             screenManager.setScreen(&level2Screen);
+            break;
+
+        case GameState::INTROLV3:
+            screenManager.setScreen(&introLevel3Screen);
+            break;
+        
+        case GameState::INTROLV4:
+            screenManager.setScreen(&introLevel4Screen);
             break;
 
         case GameState::PAUSE:
@@ -92,7 +92,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::MENU);
+    changeState(GameState::INTROLV3);
 }
 
 // =====================================
@@ -231,6 +231,27 @@ void Game::update() {
 
          break;
         }
+        // =====================
+        // INTRO LEVEL 3
+        // =====================
+
+        case GameState::INTROLV3:
+
+            if(input.wasPressed(Button::BTN_GREEN)) {
+                tft->fillScreen(TFT_BLACK);
+                changeState(GameState::INTROLV4);
+            }
+        
+        // =====================
+        // INTRO LEVEL 4
+        // =====================
+
+        case GameState::INTROLV4:
+
+            if(input.wasPressed(Button::BTN_GREEN)) {
+                tft->fillScreen(TFT_BLACK);
+                changeState(GameState::INTROLV2);
+            }
 
         // =====================
         // PAUSE
