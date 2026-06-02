@@ -10,6 +10,7 @@
 
 #include "../screens/MenuScreen.h"
 #include "../screens/IntroScreen.h"
+#include "../screens/TutorialScreen.h"
 #include "../screens/IntroLevel1Screen.h"
 #include "../screens/Level1Screen.h"
 #include "../screens/IntroLevel2Screen.h"
@@ -38,6 +39,8 @@ private:
     // =====================================
 
     MenuScreen menuScreen;
+
+    TutorialScreen tutorialScreen;
 
     IntroScreen introScreen;
 

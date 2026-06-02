@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #include "../screens/MenuScreen.h"
+#include "../screens/TutorialScreen.h"
 #include "../screens/IntroScreen.h"
 #include "../screens/IntroLevel1Screen.h"
 #include "../screens/Level1Screen.h"
@@ -15,6 +16,7 @@
 Game::Game(TFT_eSPI* display)
 
 : menuScreen(display),
+  tutorialScreen(display),
   introScreen(display),
   introLevel1Screen(display),
   level1Screen(display, &input),
@@ -42,6 +44,10 @@ void Game::changeState(GameState newState) {
 
         case GameState::MENU:
             screenManager.setScreen(&menuScreen);
+            break;
+
+        case GameState::TUTORIAL:
+            screenManager.setScreen(&tutorialScreen);
             break;
 
         case GameState::INTRO:
@@ -86,7 +92,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::INTROLV2);
+    changeState(GameState::MENU);
 }
 
 // =====================================
@@ -104,6 +110,19 @@ void Game::update() {
         // =====================
 
         case GameState::MENU:
+
+            if(input.wasPressed(Button::BTN_GREEN)) {
+
+                changeState(GameState::TUTORIAL);
+            }
+
+            break;
+        
+        // =====================
+        // TUTORIAL
+        // =====================
+
+        case GameState::TUTORIAL:
 
             if(input.wasPressed(Button::BTN_GREEN)) {
 

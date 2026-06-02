@@ -3,6 +3,7 @@
 enum class GameState {
 
     MENU,
+    TUTORIAL,
     INTRO,
     INTROLV1,
     LEVEL1,
