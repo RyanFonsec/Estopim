@@ -1,5 +1,19 @@
 #include "Game.h"
 
+#include "../screens/MenuScreen.h"
+#include "../screens/TutorialScreen.h"
+#include "../screens/IntroScreen.h"
+#include "../screens/IntroLevel1Screen.h"
+#include "../screens/Level1Screen.h"
+#include "../screens/IntroLevel2Screen.h"
+#include "../screens/Level2Screen.h"
+#include "../screens/IntroLevel3Screen.h"
+#include "../screens/IntroLevel4Screen.h"
+#include "../screens/PauseScreen.h"
+#include "../screens/WinScreen.h"
+#include "../screens/GameOverScreen.h"
+#include "../systems/FeedbackSystem.h"
+
 Game::Game(TFT_eSPI* display)
 
 : menuScreen(display),
@@ -108,162 +122,123 @@ void Game::update() {
         // =====================
         // MENU
         // =====================
-
         case GameState::MENU:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
-
                 changeState(GameState::TUTORIAL);
             }
-
             break;
         
         // =====================
         // TUTORIAL
         // =====================
-
         case GameState::TUTORIAL:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
-
                 changeState(GameState::INTRO);
             }
-
             break;
 
         // =====================
         // INTRO
         // =====================
-
         case GameState::INTRO:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
-
                 changeState(GameState::INTROLV1);
             }
+            break; // CORRIGIDO: Adicionado break para não invadir o INTROLV1
 
         // =====================
         // INTRO LEVEL 1
         // =====================
-
         case GameState::INTROLV1:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
-
                 changeState(GameState::LEVEL1);
             }
-
-            break;
-
             break;
 
         // =====================
         // LEVEL1
         // =====================
-
         case GameState::LEVEL1:
         {
             // PAUSE
-
             if(input.wasPressed(Button::BTN_BLACK)) {
-
                 changeState(GameState::PAUSE);
             }
 
-            Level1Screen* level =
-
-            static_cast<Level1Screen*>(
+            Level1Screen* level = static_cast<Level1Screen*>(
                 screenManager.getCurrentScreen()
             );
 
             if(level->isFinished()) {
-
                 if(level->isPlayerDead()) {
-
                     changeState(GameState::GAME_OVER);
                 }
                 else {
-
                     changeState(GameState::INTROLV2);
                 }
             }
-
-         break;
+            break;
         }
 
         // =====================
         // INTRO LEVEL 2
         // =====================
-
         case GameState::INTROLV2:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
                 changeState(GameState::LEVEL2);
             }
+            break; // CORRIGIDO: Evita invadir o LEVEL2 e quebrar o ponteiro da tela
 
         // =====================
         // LEVEL2
         // =====================
-
         case GameState::LEVEL2:
         {
             // PAUSE
-
             if(input.wasPressed(Button::BTN_BLACK)) {
-
                 changeState(GameState::PAUSE);
             }
 
-            Level2Screen* level =
-
-            static_cast<Level2Screen*>(
+            Level2Screen* level = static_cast<Level2Screen*>(
                 screenManager.getCurrentScreen()
             );
 
-        if(level->isFinished()) {
-
-            if(level->isPlayerDead()) {
-
-                changeState(GameState::GAME_OVER);
+            if(level->isFinished()) {
+                if(level->isPlayerDead()) {
+                    changeState(GameState::GAME_OVER);
+                }
             }
+            break;
         }
 
-         break;
-        }
         // =====================
         // INTRO LEVEL 3
         // =====================
-
         case GameState::INTROLV3:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
                 changeState(GameState::INTROLV4);
             }
+            break; // CORRIGIDO: Adicionado break
         
         // =====================
         // INTRO LEVEL 4
         // =====================
-
         case GameState::INTROLV4:
-
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
                 changeState(GameState::INTROLV2);
             }
+            break; // CORRIGIDO: Adicionado break
 
         // =====================
         // PAUSE
         // =====================
-
         case GameState::PAUSE:
-
             if(input.wasPressed(Button::BTN_BLACK)) {
-
                 changeState(GameState::LEVEL1);
             }
-
             break;
 
         default:
@@ -273,13 +248,13 @@ void Game::update() {
     // =====================
     // RESET GLOBAL
     // =====================
-
     if(input.wasPressed(Button::BTN_WHITE)) {
         ESP.restart();
     }
 
     screenManager.update();
 }
+
 
 // =====================================
 // RENDER
