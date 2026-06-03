@@ -106,7 +106,7 @@ void Game::begin() {
 
     input.begin();
     feedback.begin();
-    changeState(GameState::INTROLV3);
+    changeState(GameState::LEVEL2);
 }
 
 // =====================================
@@ -195,7 +195,6 @@ void Game::update() {
         // =====================
         case GameState::LEVEL2:
         {
-            // PAUSE
             if(input.wasPressed(Button::BTN_BLACK)) {
                 changeState(GameState::PAUSE);
             }
@@ -205,10 +204,15 @@ void Game::update() {
             );
 
             if(level->isFinished()) {
+
                 if(level->isPlayerDead()) {
                     changeState(GameState::GAME_OVER);
                 }
+                else {
+                    changeState(GameState::INTROLV3);
+                }
             }
+
             break;
         }
 
