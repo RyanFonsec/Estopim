@@ -1,26 +1,29 @@
 #pragma once
 
+#include "MusicSystem.h"
+
 class FeedbackSystem {
 
 private:
 
     int redPin;
-
     int greenPin;
-
     int bluePin;
 
     int buzzerPin;
-
     int buzzerChannel;
 
     unsigned long feedbackStart;
 
     bool active;
 
+    MusicSystem* music;
+
 public:
 
-    FeedbackSystem();
+    FeedbackSystem(
+        MusicSystem* music
+    );
 
     void begin();
 

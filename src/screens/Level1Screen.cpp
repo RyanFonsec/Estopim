@@ -7,10 +7,11 @@
 
 Level1Screen::Level1Screen(
     TFT_eSPI* display,
-    InputSystem* in
+    InputSystem* in,
+    FeedbackSystem* feedback
 )
 
-: BaseLevelScreen(display, in)
+: BaseLevelScreen(display, in, feedback)
 {
     correctAnswers = 0;
 }

@@ -25,7 +25,7 @@ protected:
 
     TimerSystem timer;
 
-    FeedbackSystem feedback;
+    FeedbackSystem* feedback;
 
     Question currentQuestion;
 
@@ -51,7 +51,8 @@ public:
 
     BaseLevelScreen(
         TFT_eSPI* display,
-        InputSystem* in
+        InputSystem* in,
+        FeedbackSystem* fb
     );
 
     void onEnter() override;

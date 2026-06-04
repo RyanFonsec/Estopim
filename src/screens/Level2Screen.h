@@ -9,7 +9,7 @@ class Level2Screen : public BaseLevelScreen {
 
 public:
 
-    Level2Screen(TFT_eSPI* display, InputSystem* input);
+    Level2Screen(TFT_eSPI* display, InputSystem* input, FeedbackSystem* feedback);
     ~Level2Screen();
 
     void onEnter()       override;

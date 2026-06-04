@@ -2,7 +2,8 @@
 
 // Construtor limpo: Inicializa os ponteiros como nulos
 // para não gastar memória antes da hora (evita o crash global)
-Game::Game(TFT_eSPI* display) {
+Game::Game(TFT_eSPI* display)   
+{
     tft = display;
     
     menuScreen = nullptr;
@@ -19,6 +20,7 @@ Game::Game(TFT_eSPI* display) {
     pauseScreen = nullptr;
     winScreen = nullptr;
     gameOverScreen = nullptr;
+    feedback = nullptr;
 }
 
 // Destrutor: Garante a liberação de memória Heap
@@ -44,25 +46,29 @@ Game::~Game() {
 // =====================================
 void Game::begin() {
     input.begin();
-    feedback.begin();
+    music.begin();
+    feedback =
+        new FeedbackSystem(&music);
+
+    feedback->begin();
 
     // Instancia as telas dinamicamente na RAM (Heap) após o tft.init() ter rodado
     menuScreen = new MenuScreen(tft);
     tutorialScreen = new TutorialScreen(tft);
     introScreen = new IntroScreen(tft);
     introLevel1Screen = new IntroLevel1Screen(tft);
-    level1Screen = new Level1Screen(tft, &input);
+    level1Screen = new Level1Screen(tft, &input, feedback);
     introLevel2Screen = new IntroLevel2Screen(tft);
-    level2Screen = new Level2Screen(tft, &input);
+    level2Screen = new Level2Screen(tft, &input, feedback);
     introLevel3Screen = new IntroLevel3Screen(tft);
-    level3Screen = new Level3Screen(tft, &input);
+    level3Screen = new Level3Screen(tft, &input, feedback);
     introLevel4Screen = new IntroLevel4Screen(tft);
-    level4Screen = new Level4Screen(tft, &input);
+    level4Screen = new Level4Screen(tft, &input, feedback);
     pauseScreen = new PauseScreen(tft);
     winScreen = new WinScreen(tft);
     gameOverScreen = new GameOverScreen(tft);
 
-    changeState(GameState::LEVEL4);
+    changeState(GameState::MENU);
 }
 
 // =====================================
@@ -139,6 +145,8 @@ void Game::changeState(GameState newState) {
 // =====================================
 void Game::update() {
     input.update();
+    music.update();
+    feedback->update();
 
     switch(currentState) {
         case GameState::MENU:

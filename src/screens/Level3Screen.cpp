@@ -5,10 +5,11 @@
 
 Level3Screen::Level3Screen(
     TFT_eSPI* display,
-    InputSystem* in
+    InputSystem* in,
+    FeedbackSystem* feedback
 )
 
-: BaseLevelScreen(display, in)
+: BaseLevelScreen(display, in, feedback)
 {
     destroyedBlocks = 0;
 }
@@ -53,7 +54,7 @@ void Level3Screen::checkAnswer(int index) {
 
     if(index == currentQuestion.correctIndex)
     {
-        feedback.success();
+        feedback->success();
 
         blocks[destroyedBlocks].destroyed = true;
 
@@ -79,7 +80,7 @@ void Level3Screen::checkAnswer(int index) {
     }
     else {
 
-        feedback.error();
+        feedback->error();
 
         lives--;
 

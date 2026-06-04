@@ -5,6 +5,7 @@
 #include "../core/ScreenManager.h"
 #include "../core/GameState.h"
 #include "../systems/FeedbackSystem.h"
+#include "../systems/MusicSystem.h"
 
 // Includes das telas
 #include "../screens/MenuScreen.h"
@@ -28,7 +29,8 @@ private:
     TFT_eSPI* tft;
     InputSystem input;
     ScreenManager screenManager;
-    FeedbackSystem feedback;
+    MusicSystem music;
+    FeedbackSystem* feedback;
     GameState currentState;
 
     // =====================================
@@ -48,6 +50,7 @@ private:
     PauseScreen* pauseScreen;
     WinScreen* winScreen;
     GameOverScreen* gameOverScreen;
+    
 
 public:
     Game(TFT_eSPI* display);

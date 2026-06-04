@@ -2,11 +2,15 @@
 
 BaseLevelScreen::BaseLevelScreen(
     TFT_eSPI* display,
-    InputSystem* in
+    InputSystem* in,
+    FeedbackSystem* fb
 )
 
 : hud(display)
 {
+
+    feedback = fb;
+
     tft = display;
 
     input = in;
@@ -30,7 +34,7 @@ BaseLevelScreen::BaseLevelScreen(
 
 void BaseLevelScreen::onEnter() {
 
-    feedback.begin();
+    feedback->begin();
 
     generateQuestion();
 
@@ -40,12 +44,12 @@ void BaseLevelScreen::onEnter() {
 }
 
 void BaseLevelScreen::onExit() {
-    feedback.clear();
+    feedback->clear();
 }
 
 void BaseLevelScreen::generateQuestion() {
 
-    feedback.clear();
+    feedback->clear();
 
     currentQuestion = createQuestion();
 
@@ -72,7 +76,7 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
 
         levelState = LevelState::CORRECT;
 
-        feedback.success();
+        feedback->success();
 
         lastAnswerCorrect = true;
     }
@@ -82,7 +86,7 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
 
         levelState = LevelState::WRONG;
 
-        feedback.error();
+        feedback->error();
 
         hudDirty = true;
 
@@ -96,7 +100,7 @@ void BaseLevelScreen::checkAnswer(int answerIndex) {
 
 void BaseLevelScreen::update() {
 
-    feedback.update();
+    feedback->update();
     
     if(levelState == LevelState::PLAYING &&
        timer.every(1000)) {
@@ -115,7 +119,7 @@ void BaseLevelScreen::update() {
 
             levelState = LevelState::TIMEOUT;
 
-            feedback.timeout();
+            feedback->timeout();
 
             feedbackStart = millis();
 

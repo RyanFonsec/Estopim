@@ -4,8 +4,8 @@
 #include "../assets/sprites/enemy1.h"
 #include "../assets/sprites/player_knife1.h"
 
-Level2Screen::Level2Screen(TFT_eSPI* display, InputSystem* input)
-    : BaseLevelScreen(display, input),
+Level2Screen::Level2Screen(TFT_eSPI* display, InputSystem* input,FeedbackSystem* feedback)
+    : BaseLevelScreen(display, input, feedback),
       enemySprite(display)
 {
     spawnInterval  = 3000;
@@ -23,8 +23,8 @@ Level2Screen::~Level2Screen() {
 }
 
 void Level2Screen::onEnter() {
-    feedback.begin();
-    feedback.clear();
+    feedback->begin();
+    feedback->clear();
 
     hud.setBackground(level2_bg);
 
@@ -190,13 +190,13 @@ void Level2Screen::checkEnemyAnswer(int answerIndex) {
     if (first == -1) return;
 
     if (answerIndex == enemies[first].question.correctIndex) {
-        feedback.success();
+        feedback->success();
         feedbackStart = millis();
         removeEnemy(first);
         questionDirty = true;
         needsRender   = true;
     } else {
-        feedback.error();
+        feedback->error();
         feedbackStart = millis();
         lives--;
         hudDirty    = true;
@@ -212,7 +212,7 @@ void Level2Screen::update() {
 
     if (feedbackStart > 0 && millis() - feedbackStart >= 300) {
 
-        feedback.clear();
+        feedback->clear();
         feedbackStart = 0;
     }
 
@@ -245,7 +245,7 @@ void Level2Screen::update() {
             hudDirty      = true;
             questionDirty = true;
             needsRender   = true;
-            feedback.error();
+            feedback->error();
             feedbackStart = millis();
         } else {
             drawEnemy(i, prevX);
@@ -257,7 +257,7 @@ void Level2Screen::update() {
     if (input->wasPressed(Button::BTN_BLUE)) checkEnemyAnswer(2);
 
     if (lives    <= 0) { finished = true; playerDead = true; }
-    if (timeLeft <= 0) { finished = true;     feedback.timeout(); feedbackStart = millis();}
+    if (timeLeft <= 0) { finished = true;     feedback->timeout(); feedbackStart = millis();}
 }
 
 void Level2Screen::render() {

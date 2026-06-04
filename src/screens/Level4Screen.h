@@ -30,7 +30,8 @@ public:
 
     Level4Screen(
         TFT_eSPI* display,
-        InputSystem* in
+        InputSystem* in,
+        FeedbackSystem* feedback
     );
 
     GameState getState() override;

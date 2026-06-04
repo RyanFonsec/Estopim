@@ -9,10 +9,11 @@
 
 Level4Screen::Level4Screen(
     TFT_eSPI* display,
-    InputSystem* in
+    InputSystem* in,
+    FeedbackSystem* feedback
 )
 
-: BaseLevelScreen(display, in)
+: BaseLevelScreen(display, in, feedback)
 {
     destroyedEnemies = 0;
 
@@ -81,7 +82,7 @@ void Level4Screen::checkAnswer(int index) {
 
     if(index == currentQuestion.correctIndex) {
 
-        feedback.success();
+        feedback->success();
 
         enemies[destroyedEnemies]
             .destroyed = true;
@@ -111,7 +112,7 @@ void Level4Screen::checkAnswer(int index) {
     }
     else {
 
-        feedback.error();
+        feedback->error();
 
         lives--;
 
