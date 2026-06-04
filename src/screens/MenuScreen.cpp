@@ -1,7 +1,6 @@
 #include "MenuScreen.h"
 #include "../assets/screen/menu_bg.h"
 
-
 MenuScreen::MenuScreen(TFT_eSPI* display) {
 
     tft = display;

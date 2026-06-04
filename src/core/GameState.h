@@ -12,6 +12,7 @@ enum class GameState {
     INTROLV3,
     LEVEL3,
     INTROLV4,
+    LEVEL4,
     PAUSE,
     WIN,
     GAME_OVER

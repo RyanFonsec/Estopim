@@ -85,11 +85,11 @@ protected:
     virtual void clearTimerArea() = 0;
 
     virtual void checkAnswer(int index) = 0;
-    
+ 
+    virtual void renderQuestion();
+
     void generateQuestion();
 
     void renderHUD();
-
-    void renderQuestion();
 
 };

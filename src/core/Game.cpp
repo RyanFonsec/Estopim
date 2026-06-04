@@ -15,6 +15,7 @@ Game::Game(TFT_eSPI* display) {
     introLevel3Screen = nullptr;
     level3Screen = nullptr;
     introLevel4Screen = nullptr;
+    level4Screen = nullptr;
     pauseScreen = nullptr;
     winScreen = nullptr;
     gameOverScreen = nullptr;
@@ -32,6 +33,7 @@ Game::~Game() {
     delete introLevel3Screen;
     delete level3Screen;
     delete introLevel4Screen;
+    delete level4Screen;
     delete pauseScreen;
     delete winScreen;
     delete gameOverScreen;
@@ -55,11 +57,12 @@ void Game::begin() {
     introLevel3Screen = new IntroLevel3Screen(tft);
     level3Screen = new Level3Screen(tft, &input);
     introLevel4Screen = new IntroLevel4Screen(tft);
+    level4Screen = new Level4Screen(tft, &input);
     pauseScreen = new PauseScreen(tft);
     winScreen = new WinScreen(tft);
     gameOverScreen = new GameOverScreen(tft);
 
-    changeState(GameState::LEVEL3);
+    changeState(GameState::LEVEL4);
 }
 
 // =====================================
@@ -108,6 +111,10 @@ void Game::changeState(GameState newState) {
 
         case GameState::INTROLV4:
             screenManager.setScreen(introLevel4Screen);
+            break;
+
+        case GameState::LEVEL4:
+            screenManager.setScreen(level4Screen);
             break;
 
         case GameState::PAUSE:
@@ -235,9 +242,35 @@ void Game::update() {
         case GameState::INTROLV4:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
-                changeState(GameState::INTROLV2);
+                changeState(GameState::LEVEL4);
             }
             break;
+
+        case GameState::LEVEL4:
+        {
+            Level4Screen* level =
+                static_cast<Level4Screen*>(
+                    screenManager.getCurrentScreen()
+                );
+
+            if(level->isFinished()) {
+
+                if(level->isPlayerDead()) {
+
+                    changeState(
+                        GameState::GAME_OVER
+                    );
+                }
+                else {
+
+                    changeState(
+                        GameState::WIN
+                    );
+                }
+            }
+
+            break;
+        }
 
         case GameState::PAUSE:
             if(input.wasPressed(Button::BTN_BLACK)) {

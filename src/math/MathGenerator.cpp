@@ -149,3 +149,120 @@ Question MathGenerator::generateWallQuestion() {
 
     return q;
 }
+
+Question MathGenerator::generateReverseQuestion() {
+
+    Question q;
+
+    int op = random(0, 4);
+
+    int hidden;
+
+    switch(op) {
+
+        // ? + b = c
+        case 0:
+        {
+            hidden = random(1, 10);
+
+            q.num2 = random(1, 10);
+
+            q.correctAnswer =
+                hidden;
+
+            q.num1 =
+                hidden + q.num2;
+
+            q.operation = '+';
+
+            break;
+        }
+
+        // a - ? = c
+        case 1:
+        {
+            hidden = random(1, 10);
+
+            q.correctAnswer =
+                hidden;
+
+            q.num1 =
+                random(10, 20);
+
+            q.num2 =
+                q.num1 - hidden;
+
+            q.operation = '-';
+
+            break;
+        }
+
+        // ? * b = c
+        case 2:
+        {
+            hidden = random(2, 10);
+
+            q.correctAnswer =
+                hidden;
+
+            q.num2 =
+                random(2, 10);
+
+            q.num1 =
+                hidden * q.num2;
+
+            q.operation = '*';
+
+            break;
+        }
+
+        // a / ? = c
+        default:
+        {
+            hidden = random(2, 10);
+
+            q.correctAnswer =
+                hidden;
+
+            q.num2 =
+                random(2, 10);
+
+            q.num1 =
+                hidden * q.num2;
+
+            q.operation = '/';
+
+            break;
+        }
+    }
+
+    q.correctIndex = random(0, 3);
+
+    for(int i = 0; i < 3; i++) {
+
+        if(i == q.correctIndex) {
+
+            q.options[i] =
+                q.correctAnswer;
+        }
+        else {
+
+            int wrong;
+
+            do {
+
+                wrong =
+                    q.correctAnswer +
+                    random(-5, 6);
+
+            } while(
+                wrong <= 0 ||
+                wrong == q.correctAnswer
+            );
+
+            q.options[i] = wrong;
+        }
+    }
+
+    return q;
+}

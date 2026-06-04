@@ -26,7 +26,7 @@ GameState IntroLevel2Screen::getState() {
 }
 
 void IntroLevel2Screen::render() {
-
+/*
     tft->setSwapBytes(true);
 
     tft->pushImage(
@@ -35,5 +35,5 @@ void IntroLevel2Screen::render() {
         320,
         240,
         Intro_Level2_Screen
-    );
+    );*/
 }

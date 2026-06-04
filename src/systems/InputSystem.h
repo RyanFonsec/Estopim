@@ -3,10 +3,10 @@
 #include <Arduino.h>
 
 enum class Button {
-
+    
     BTN_GREEN,
+    BTN_RED,
     BTN_BLUE,
-    BTN_YELLOW,
     BTN_BLACK,
     BTN_WHITE
 

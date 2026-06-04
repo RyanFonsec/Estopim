@@ -130,12 +130,12 @@ void BaseLevelScreen::update() {
             checkAnswer(0);
         }
 
-        if(input->wasPressed(Button::BTN_BLUE)) {
+        if(input->wasPressed(Button::BTN_RED)) {
 
             checkAnswer(1);
         }
 
-        if(input->wasPressed(Button::BTN_YELLOW)) {
+        if(input->wasPressed(Button::BTN_BLUE)) {
 
             checkAnswer(2);
         }
@@ -252,7 +252,7 @@ void BaseLevelScreen::renderQuestion() {
         195,
         90,
         30,
-        TFT_BLUE
+        TFT_RED
     );
 
     tft->setTextColor(TFT_WHITE);
@@ -269,7 +269,7 @@ void BaseLevelScreen::renderQuestion() {
         195,
         90,
         30,
-        TFT_YELLOW
+        TFT_BLUE
     );
 
     tft->setTextColor(TFT_BLACK);

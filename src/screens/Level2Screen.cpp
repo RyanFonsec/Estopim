@@ -253,8 +253,8 @@ void Level2Screen::update() {
     }
 
     if (input->wasPressed(Button::BTN_GREEN))  checkEnemyAnswer(0);
-    if (input->wasPressed(Button::BTN_BLUE))   checkEnemyAnswer(1);
-    if (input->wasPressed(Button::BTN_YELLOW)) checkEnemyAnswer(2);
+    if (input->wasPressed(Button::BTN_RED))   checkEnemyAnswer(1);
+    if (input->wasPressed(Button::BTN_BLUE)) checkEnemyAnswer(2);
 
     if (lives    <= 0) { finished = true; playerDead = true; }
     if (timeLeft <= 0) { finished = true;     feedback.timeout(); feedbackStart = millis();}
