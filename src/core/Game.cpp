@@ -208,14 +208,27 @@ void Game::update() {
         
         case GameState::LEVEL3:
         {
-            Level3Screen* level = static_cast<Level3Screen*>(screenManager.getCurrentScreen());
+            if(input.wasPressed(Button::BTN_BLACK)) {
+                changeState(GameState::PAUSE);
+            }
+
+            Level3Screen* level =
+                static_cast<Level3Screen*>(
+                    screenManager.getCurrentScreen()
+                );
+
             if(level->isFinished()) {
+
                 if(level->isPlayerDead()) {
+
                     changeState(GameState::GAME_OVER);
-                } else {
+                }
+                else {
+
                     changeState(GameState::INTROLV4);
                 }
             }
+
             break;
         }
 

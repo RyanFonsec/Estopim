@@ -49,15 +49,16 @@ Question Level3Screen::createQuestion() {
 
 void Level3Screen::checkAnswer(int index) {
 
-    if(index ==
-       currentQuestion.correctIndex)
+    if(index == currentQuestion.correctIndex)
     {
         feedback.success();
 
-        blocks[destroyedBlocks]
-            .destroyed = true;
+        blocks[destroyedBlocks].destroyed = true;
 
         destroyedBlocks++;
+
+        timeLeft = 15;
+        hudDirty = true;
 
         if(destroyedBlocks >= TOTAL_BLOCKS) {
 
