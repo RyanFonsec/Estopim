@@ -8,5 +8,6 @@ public:
 
     static Question generateEasyQuestion();
     static Question generateSubtractionQuestion();
+    static Question generateWallQuestion();
 
 };

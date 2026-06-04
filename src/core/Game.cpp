@@ -1,96 +1,125 @@
 #include "Game.h"
 
-#include "../screens/MenuScreen.h"
-#include "../screens/TutorialScreen.h"
-#include "../screens/IntroScreen.h"
-#include "../screens/IntroLevel1Screen.h"
-#include "../screens/Level1Screen.h"
-#include "../screens/IntroLevel2Screen.h"
-#include "../screens/Level2Screen.h"
-#include "../screens/IntroLevel3Screen.h"
-#include "../screens/IntroLevel4Screen.h"
-#include "../screens/PauseScreen.h"
-#include "../screens/WinScreen.h"
-#include "../screens/GameOverScreen.h"
-#include "../systems/FeedbackSystem.h"
-
-Game::Game(TFT_eSPI* display)
-
-: menuScreen(display),
-  tutorialScreen(display),
-  introScreen(display),
-  introLevel1Screen(display),
-  level1Screen(display, &input),
-  introLevel2Screen(display),
-  level2Screen(display, &input),
-  introLevel3Screen(display),
-  introLevel4Screen(display),
-  pauseScreen(display),
-  winScreen(display),
-  gameOverScreen(display)
-
-{
+// Construtor limpo: Inicializa os ponteiros como nulos
+// para não gastar memória antes da hora (evita o crash global)
+Game::Game(TFT_eSPI* display) {
     tft = display;
+    
+    menuScreen = nullptr;
+    tutorialScreen = nullptr;
+    introScreen = nullptr;
+    introLevel1Screen = nullptr;
+    level1Screen = nullptr;
+    introLevel2Screen = nullptr;
+    level2Screen = nullptr;
+    introLevel3Screen = nullptr;
+    level3Screen = nullptr;
+    introLevel4Screen = nullptr;
+    pauseScreen = nullptr;
+    winScreen = nullptr;
+    gameOverScreen = nullptr;
+}
+
+// Destrutor: Garante a liberação de memória Heap
+Game::~Game() {
+    delete menuScreen;
+    delete tutorialScreen;
+    delete introScreen;
+    delete introLevel1Screen;
+    delete level1Screen;
+    delete introLevel2Screen;
+    delete level2Screen;
+    delete introLevel3Screen;
+    delete level3Screen;
+    delete introLevel4Screen;
+    delete pauseScreen;
+    delete winScreen;
+    delete gameOverScreen;
+}
+
+// =====================================
+// BEGIN
+// =====================================
+void Game::begin() {
+    input.begin();
+    feedback.begin();
+
+    // Instancia as telas dinamicamente na RAM (Heap) após o tft.init() ter rodado
+    menuScreen = new MenuScreen(tft);
+    tutorialScreen = new TutorialScreen(tft);
+    introScreen = new IntroScreen(tft);
+    introLevel1Screen = new IntroLevel1Screen(tft);
+    level1Screen = new Level1Screen(tft, &input);
+    introLevel2Screen = new IntroLevel2Screen(tft);
+    level2Screen = new Level2Screen(tft, &input);
+    introLevel3Screen = new IntroLevel3Screen(tft);
+    level3Screen = new Level3Screen(tft, &input);
+    introLevel4Screen = new IntroLevel4Screen(tft);
+    pauseScreen = new PauseScreen(tft);
+    winScreen = new WinScreen(tft);
+    gameOverScreen = new GameOverScreen(tft);
+
+    changeState(GameState::LEVEL3);
 }
 
 // =====================================
 // CHANGE STATE
 // =====================================
-
 void Game::changeState(GameState newState) {
-
     currentState = newState;
-
     input.reset();
 
     switch(currentState) {
-
         case GameState::MENU:
-            screenManager.setScreen(&menuScreen);
+            screenManager.setScreen(menuScreen); 
             break;
 
         case GameState::TUTORIAL:
-            screenManager.setScreen(&tutorialScreen);
+            screenManager.setScreen(tutorialScreen);
             break;
 
         case GameState::INTRO:
-            screenManager.setScreen(&introScreen);
+            screenManager.setScreen(introScreen);
             break;
         
         case GameState::INTROLV1:
-            screenManager.setScreen(&introLevel1Screen);
+            screenManager.setScreen(introLevel1Screen);
             break;
 
         case GameState::LEVEL1:
-            screenManager.setScreen(&level1Screen);
+            screenManager.setScreen(level1Screen);
             break;
 
         case GameState::INTROLV2:
-            screenManager.setScreen(&introLevel2Screen);
+            screenManager.setScreen(introLevel2Screen);
             break;
 
         case GameState::LEVEL2:
-            screenManager.setScreen(&level2Screen);
+            screenManager.setScreen(level2Screen);
             break;
 
         case GameState::INTROLV3:
-            screenManager.setScreen(&introLevel3Screen);
+            screenManager.setScreen(introLevel3Screen);
             break;
-        
+
+        case GameState::LEVEL3:
+            screenManager.setScreen(level3Screen);
+            break;
+
         case GameState::INTROLV4:
-            screenManager.setScreen(&introLevel4Screen);
+            screenManager.setScreen(introLevel4Screen);
             break;
 
         case GameState::PAUSE:
-            screenManager.setScreen(&pauseScreen);
+            screenManager.setScreen(pauseScreen);
             break;
 
         case GameState::WIN:
-            screenManager.setScreen(&winScreen);
+            screenManager.setScreen(winScreen);
             break;
 
         case GameState::GAME_OVER:
-            screenManager.setScreen(&gameOverScreen);
+            screenManager.setScreen(gameOverScreen);
             break;
 
         default:
@@ -99,146 +128,104 @@ void Game::changeState(GameState newState) {
 }
 
 // =====================================
-// BEGIN
-// =====================================
-
-void Game::begin() {
-
-    input.begin();
-    feedback.begin();
-    changeState(GameState::LEVEL2);
-}
-
-// =====================================
 // UPDATE
 // =====================================
-
 void Game::update() {
-
     input.update();
 
     switch(currentState) {
-
-        // =====================
-        // MENU
-        // =====================
         case GameState::MENU:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 changeState(GameState::TUTORIAL);
             }
             break;
         
-        // =====================
-        // TUTORIAL
-        // =====================
         case GameState::TUTORIAL:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 changeState(GameState::INTRO);
             }
             break;
 
-        // =====================
-        // INTRO
-        // =====================
         case GameState::INTRO:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 changeState(GameState::INTROLV1);
             }
-            break; // CORRIGIDO: Adicionado break para não invadir o INTROLV1
+            break;
 
-        // =====================
-        // INTRO LEVEL 1
-        // =====================
         case GameState::INTROLV1:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 changeState(GameState::LEVEL1);
             }
             break;
 
-        // =====================
-        // LEVEL1
-        // =====================
         case GameState::LEVEL1:
         {
-            // PAUSE
             if(input.wasPressed(Button::BTN_BLACK)) {
                 changeState(GameState::PAUSE);
             }
 
-            Level1Screen* level = static_cast<Level1Screen*>(
-                screenManager.getCurrentScreen()
-            );
-
+            Level1Screen* level = static_cast<Level1Screen*>(screenManager.getCurrentScreen());
             if(level->isFinished()) {
                 if(level->isPlayerDead()) {
                     changeState(GameState::GAME_OVER);
-                }
-                else {
+                } else {
                     changeState(GameState::INTROLV2);
                 }
             }
             break;
         }
 
-        // =====================
-        // INTRO LEVEL 2
-        // =====================
         case GameState::INTROLV2:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
                 changeState(GameState::LEVEL2);
             }
-            break; // CORRIGIDO: Evita invadir o LEVEL2 e quebrar o ponteiro da tela
+            break;
 
-        // =====================
-        // LEVEL2
-        // =====================
         case GameState::LEVEL2:
         {
             if(input.wasPressed(Button::BTN_BLACK)) {
                 changeState(GameState::PAUSE);
             }
 
-            Level2Screen* level = static_cast<Level2Screen*>(
-                screenManager.getCurrentScreen()
-            );
-
+            Level2Screen* level = static_cast<Level2Screen*>(screenManager.getCurrentScreen());
             if(level->isFinished()) {
-
                 if(level->isPlayerDead()) {
                     changeState(GameState::GAME_OVER);
-                }
-                else {
+                } else {
                     changeState(GameState::INTROLV3);
                 }
             }
-
             break;
         }
 
-        // =====================
-        // INTRO LEVEL 3
-        // =====================
         case GameState::INTROLV3:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
-                changeState(GameState::INTROLV4);
+                changeState(GameState::LEVEL3);
             }
-            break; // CORRIGIDO: Adicionado break
+            break;
         
-        // =====================
-        // INTRO LEVEL 4
-        // =====================
+        case GameState::LEVEL3:
+        {
+            Level3Screen* level = static_cast<Level3Screen*>(screenManager.getCurrentScreen());
+            if(level->isFinished()) {
+                if(level->isPlayerDead()) {
+                    changeState(GameState::GAME_OVER);
+                } else {
+                    changeState(GameState::INTROLV4);
+                }
+            }
+            break;
+        }
+
         case GameState::INTROLV4:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 tft->fillScreen(TFT_BLACK);
                 changeState(GameState::INTROLV2);
             }
-            break; // CORRIGIDO: Adicionado break
+            break;
 
-        // =====================
-        // PAUSE
-        // =====================
         case GameState::PAUSE:
             if(input.wasPressed(Button::BTN_BLACK)) {
                 changeState(GameState::LEVEL1);
@@ -249,9 +236,6 @@ void Game::update() {
             break;
     }
 
-    // =====================
-    // RESET GLOBAL
-    // =====================
     if(input.wasPressed(Button::BTN_WHITE)) {
         ESP.restart();
     }
@@ -259,12 +243,9 @@ void Game::update() {
     screenManager.update();
 }
 
-
 // =====================================
 // RENDER
 // =====================================
-
 void Game::render() {
-
     screenManager.render();
 }

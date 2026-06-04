@@ -9,7 +9,6 @@ TFT_eSPI tft = TFT_eSPI();
 Game game(&tft);
 
 void setup() {
-
     tft.init();
 
     tft.setRotation(1);
