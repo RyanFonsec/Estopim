@@ -13,6 +13,8 @@ private:
         Question question;
     };
 
+    bool wallDirty;
+
     int destroyedBlocks;
 
     static const int TOTAL_BLOCKS = 6;

@@ -21,6 +21,8 @@ void Level3Screen::onEnter() {
 
     destroyedBlocks = 0;
 
+    wallDirty = true;
+
     for(int i = 0; i < TOTAL_BLOCKS; i++) {
 
         blocks[i].destroyed = false;
@@ -56,7 +58,7 @@ void Level3Screen::checkAnswer(int index) {
         blocks[destroyedBlocks].destroyed = true;
 
         destroyedBlocks++;
-
+        wallDirty = true;
         timeLeft = 15;
         hudDirty = true;
 
@@ -143,6 +145,10 @@ void Level3Screen::clearQuestionArea() {
 
 void Level3Screen::renderGameplay() {
 
+    if(!wallDirty) {
+        return;
+    }
+
     clearGameplayArea();
 
     int remaining =
@@ -205,4 +211,6 @@ void Level3Screen::renderGameplay() {
             2
         );
     }
+
+    wallDirty = false;
 }
