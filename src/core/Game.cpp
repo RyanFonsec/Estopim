@@ -75,12 +75,57 @@ void Game::begin() {
 // CHANGE STATE
 // =====================================
 void Game::changeState(GameState newState) {
+
     currentState = newState;
+
     input.reset();
 
+    // =====================================
+    // CONTROLE DE MÚSICA
+    // =====================================
+
     switch(currentState) {
+
+        // Telas calmas
         case GameState::MENU:
-            screenManager.setScreen(menuScreen); 
+        case GameState::TUTORIAL:
+        case GameState::INTRO:
+        case GameState::INTROLV1:
+        case GameState::INTROLV2:
+        case GameState::INTROLV3:
+        case GameState::INTROLV4:
+        case GameState::WIN:
+        case GameState::GAME_OVER:
+
+            music.setMode(
+                MusicMode::EXPLORATION
+            );
+            break;
+
+        // Telas de batalha
+        case GameState::LEVEL1:
+        case GameState::LEVEL2:
+        case GameState::LEVEL3:
+        case GameState::LEVEL4:
+        case GameState::PAUSE:
+
+            music.setMode(
+                MusicMode::BATTLE
+            );
+            break;
+
+        default:
+            break;
+    }
+
+    // =====================================
+    // TROCA DE TELA
+    // =====================================
+
+    switch(currentState) {
+
+        case GameState::MENU:
+            screenManager.setScreen(menuScreen);
             break;
 
         case GameState::TUTORIAL:
@@ -90,7 +135,7 @@ void Game::changeState(GameState newState) {
         case GameState::INTRO:
             screenManager.setScreen(introScreen);
             break;
-        
+
         case GameState::INTROLV1:
             screenManager.setScreen(introLevel1Screen);
             break;
@@ -139,7 +184,6 @@ void Game::changeState(GameState newState) {
             break;
     }
 }
-
 // =====================================
 // UPDATE
 // =====================================

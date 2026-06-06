@@ -1,8 +1,15 @@
 #pragma once
 
+enum class MusicMode {
+    EXPLORATION,
+    BATTLE
+};
+
 class MusicSystem {
 
 private:
+
+    MusicMode currentMode;
 
     int buzzerPin;
     int channel;
@@ -18,6 +25,8 @@ private:
 public:
 
     MusicSystem();
+
+    void setMode(MusicMode mode);
 
     void begin();
 
