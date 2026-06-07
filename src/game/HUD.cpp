@@ -49,10 +49,23 @@ void HUD::renderTimeBar() {
     if (!timeDirty) return;
     if (!currentBg) return;
 
-    BgUtils::restore(tft, currentBg, 0, 130, 320, 30);
+    BgUtils::restore(
+        tft, 
+        currentBg, 
+        0, 
+        130, 
+        320, 
+        30
+    );
 
     tft->setTextColor(TFT_WHITE);
-    tft->drawRightString(String(timeLeft) + " SEG", 310, 134, 2);
+
+    tft->drawRightString(
+     String(timeLeft) + " SEG",
+     305,
+     145,
+     2
+    );
 
     tft->drawRect(10, 146, 220, 10, TFT_WHITE);
 
