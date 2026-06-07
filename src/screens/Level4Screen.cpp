@@ -160,7 +160,7 @@ void Level4Screen::clearTimerArea() {
         tft,
         level4_bg,
         0,
-        130,
+        140,
         320,
         30
     );
@@ -309,7 +309,7 @@ void Level4Screen::renderGameplay() {
                 32,
                 32,
                 (uint16_t*)enemy_left,
-                TFT_BLACK
+                TFT_GREEN
             );
         }
         else {
@@ -320,7 +320,7 @@ void Level4Screen::renderGameplay() {
                 32,
                 32,
                 (uint16_t*)enemy_right,
-                TFT_BLACK
+                TFT_GREEN
             );
         }
     }
