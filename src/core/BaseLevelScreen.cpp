@@ -237,10 +237,10 @@ void BaseLevelScreen::renderQuestion() {
     );
 
     tft->fillRect(
-        10,
-        195,
-        90,
-        30,
+        35,
+        190,
+        40,
+        40,
         TFT_GREEN
     );
 
@@ -252,10 +252,10 @@ void BaseLevelScreen::renderQuestion() {
     );
 
     tft->fillRect(
-        115,
-        195,
-        90,
-        30,
+        140,
+        190,
+        40,
+        40,
         TFT_RED
     );
 
@@ -269,10 +269,10 @@ void BaseLevelScreen::renderQuestion() {
     );
 
     tft->fillRect(
-        220,
-        195,
-        90,
-        30,
+        245,
+        190,
+        40,
+        40,
         TFT_BLUE
     );
 

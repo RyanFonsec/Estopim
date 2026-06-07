@@ -4,6 +4,8 @@ enum class GameState {
 
     MENU,
     TUTORIAL,
+    TUTORIAL2, 
+    TUTORIAL3,
     INTRO,
     INTROLV1,
     LEVEL1,

@@ -8,6 +8,8 @@ Game::Game(TFT_eSPI* display)
     
     menuScreen = nullptr;
     tutorialScreen = nullptr;
+    tutorial2Screen = nullptr;
+    tutorial3Screen = nullptr;
     introScreen = nullptr;
     introLevel1Screen = nullptr;
     level1Screen = nullptr;
@@ -27,6 +29,8 @@ Game::Game(TFT_eSPI* display)
 Game::~Game() {
     delete menuScreen;
     delete tutorialScreen;
+    delete tutorial2Screen;
+    delete tutorial3Screen;
     delete introScreen;
     delete introLevel1Screen;
     delete level1Screen;
@@ -55,6 +59,8 @@ void Game::begin() {
     // Instancia as telas dinamicamente na RAM (Heap) após o tft.init() ter rodado
     menuScreen = new MenuScreen(tft);
     tutorialScreen = new TutorialScreen(tft);
+    tutorial2Screen = new Tutorial2Screen(tft);
+    tutorial3Screen = new Tutorial3Screen(tft);
     introScreen = new IntroScreen(tft);
     introLevel1Screen = new IntroLevel1Screen(tft);
     level1Screen = new Level1Screen(tft, &input, feedback);
@@ -68,7 +74,7 @@ void Game::begin() {
     winScreen = new WinScreen(tft);
     gameOverScreen = new GameOverScreen(tft);
 
-    changeState(GameState::MENU);
+    changeState(GameState::LEVEL3);
 }
 
 // =====================================
@@ -89,6 +95,8 @@ void Game::changeState(GameState newState) {
         // Telas calmas
         case GameState::MENU:
         case GameState::TUTORIAL:
+        case GameState::TUTORIAL2:
+        case GameState::TUTORIAL3:
         case GameState::INTRO:
         case GameState::INTROLV1:
         case GameState::INTROLV2:
@@ -132,6 +140,14 @@ void Game::changeState(GameState newState) {
             screenManager.setScreen(tutorialScreen);
             break;
 
+        case GameState::TUTORIAL2:
+            screenManager.setScreen(tutorial2Screen);
+            break;
+
+        case GameState::TUTORIAL3:
+            screenManager.setScreen(tutorial3Screen);
+            break;
+        
         case GameState::INTRO:
             screenManager.setScreen(introScreen);
             break;
@@ -201,10 +217,20 @@ void Game::update() {
         
         case GameState::TUTORIAL:
             if(input.wasPressed(Button::BTN_GREEN)) {
+                changeState(GameState::TUTORIAL2);
+            }
+            break;
+        
+        case GameState::TUTORIAL2:
+            if(input.wasPressed(Button::BTN_GREEN)){
+                changeState(GameState::TUTORIAL3);
+            }
+            break;
+        case GameState::TUTORIAL3:
+            if(input.wasPressed(Button::BTN_GREEN)){
                 changeState(GameState::INTRO);
             }
             break;
-
         case GameState::INTRO:
             if(input.wasPressed(Button::BTN_GREEN)) {
                 changeState(GameState::INTROLV1);

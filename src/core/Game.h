@@ -11,6 +11,8 @@
 #include "../screens/MenuScreen.h"
 #include "../screens/IntroScreen.h"
 #include "../screens/TutorialScreen.h"
+#include "../screens/Tutorial2Screen.h"
+#include "../screens/Tutorial3Screen.h"
 #include "../screens/IntroLevel1Screen.h"
 #include "../screens/Level1Screen.h"
 #include "../screens/IntroLevel2Screen.h"
@@ -38,6 +40,8 @@ private:
     // =====================================
     MenuScreen* menuScreen;
     TutorialScreen* tutorialScreen;
+    Tutorial2Screen* tutorial2Screen;
+    Tutorial3Screen* tutorial3Screen;
     IntroScreen* introScreen;
     IntroLevel1Screen* introLevel1Screen;
     Level1Screen* level1Screen;
