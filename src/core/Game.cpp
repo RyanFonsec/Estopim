@@ -74,7 +74,7 @@ void Game::begin() {
     winScreen = new WinScreen(tft);
     gameOverScreen = new GameOverScreen(tft);
 
-    changeState(GameState::INTROLV4);
+    changeState(GameState::LEVEL2);
 }
 
 // =====================================

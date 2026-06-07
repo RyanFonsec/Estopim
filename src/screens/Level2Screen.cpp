@@ -61,7 +61,7 @@ void Level2Screen::renderStatic() {
 }
 
 void Level2Screen::renderPlayer() {
-    tft->pushImage(10, 96, 32, 32, (uint16_t*)player_knife1, TFT_BLACK);
+    tft->pushImage(10, 96, 32, 32, (uint16_t*)player_knife1, TFT_GREEN);
 }
 
 void Level2Screen::clearGameplayArea() {
