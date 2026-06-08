@@ -37,13 +37,13 @@ void Level4Screen::onEnter() {
 
     int positions[6][2] = {
 
-        {20, 100},
-        {60, 100},
-        {100, 100},
+        {10, 100},
+        {50, 100},
+        {90, 100},
 
-        {220, 100},
-        {260, 100},
-        {300, 100}
+        {200, 100},
+        {240, 100},
+        {280, 100}
     };
 
     for(int i = 0; i < TOTAL_ENEMIES; i++) {
@@ -162,7 +162,7 @@ void Level4Screen::clearTimerArea() {
         0,
         140,
         320,
-        30
+        20
     );
 }
 
@@ -187,7 +187,7 @@ void Level4Screen::renderQuestion() {
 
     clearQuestionArea();
 
-    tft->setTextColor(TFT_WHITE);
+    tft->setTextColor(TFT_BLACK);
 
     String question;
 
@@ -233,10 +233,10 @@ void Level4Screen::renderQuestion() {
 
     // Verde
     tft->fillRect(
-        10,
-        195,
-        90,
-        30,
+        35,
+        190,
+        40,
+        40,
         TFT_GREEN
     );
 
@@ -251,10 +251,10 @@ void Level4Screen::renderQuestion() {
 
     // VERMELHO
     tft->fillRect(
-        115,
-        195,
-        90,
-        30,
+        140,
+        190,
+        40,
+        40,
         TFT_RED
     );
 
@@ -267,10 +267,10 @@ void Level4Screen::renderQuestion() {
 
     // azuL
     tft->fillRect(
-        220,
-        195,
-        90,
-        30,
+        245,
+        190,
+        40,
+        40,
         TFT_BLUE
     );
 

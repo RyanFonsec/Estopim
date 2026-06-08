@@ -218,7 +218,7 @@ void BaseLevelScreen::renderQuestion() {
 
     clearQuestionArea();
 
-    tft->setTextColor(TFT_WHITE);
+    tft->setTextColor(TFT_BLACK);
 
     String question =
 
