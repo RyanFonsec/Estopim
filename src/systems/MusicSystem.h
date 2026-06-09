@@ -1,8 +1,26 @@
 #pragma once
 
+enum class MusicMode {
+    EXPLORATION,
+    BATTLE
+};
+
+enum class EffectType {
+
+    NONE,
+
+    SUCCESS,
+
+    ERROR,
+
+    TIMEOUT
+};
+
 class MusicSystem {
 
 private:
+
+    MusicMode currentMode;
 
     int buzzerPin;
     int channel;
@@ -15,9 +33,17 @@ private:
     bool playingEffect;
     unsigned long effectStart;
 
+    EffectType currentEffect;
+
+    int effectStep;
+
+    unsigned long effectTimer;
+
 public:
 
     MusicSystem();
+
+    void setMode(MusicMode mode);
 
     void begin();
 

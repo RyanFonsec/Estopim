@@ -69,6 +69,12 @@ MusicSystem::MusicSystem() {
     playingEffect = false;
 
     effectStart = 0;
+
+    currentEffect = EffectType::NONE;
+
+    effectStep = 0;
+
+    effectTimer = 0;
 }
 
 // =====================================
@@ -138,37 +144,96 @@ void MusicSystem::update() {
     // FEEDBACK
     // =============================
 
-    if(playingEffect) {
+    if(playingEffect)
+{
+    unsigned long elapsed =
+        millis() - effectTimer;
 
-        if(
-            millis()
-            - effectStart
-            >= 500
-        ) {
+    int freq = 0;
 
-            playingEffect = false;
+    switch(currentEffect)
+    {
+        case EffectType::SUCCESS:
+            freq = 1200;
+            break;
 
-            if(currentMode ==
-               MusicMode::EXPLORATION) {
+        case EffectType::ERROR:
+            freq = 300;
+            break;
 
-                ledcWriteTone(
-                    channel,
-                    explorationMelody[currentNote]
-                );
-            }
-            else {
+        case EffectType::TIMEOUT:
+            freq = 700;
+            break;
 
-                ledcWriteTone(
-                    channel,
-                    battleMelody[currentNote]
-                );
-            }
-
-            noteStart = millis();
-        }
-
-        return;
+        default:
+            break;
     }
+
+    switch(effectStep)
+    {
+        case 0:
+
+            ledcWriteTone(
+                channel,
+                freq
+            );
+
+            effectStep++;
+
+            effectTimer = millis();
+
+            break;
+
+        case 1:
+
+            if(elapsed >= 100)
+            {
+                ledcWriteTone(
+                    channel,
+                    0
+                );
+
+                effectStep++;
+
+                effectTimer = millis();
+            }
+
+            break;
+
+        case 2:
+
+            if(elapsed >= 50)
+            {
+                ledcWriteTone(
+                    channel,
+                    freq
+                );
+
+                effectStep++;
+
+                effectTimer = millis();
+            }
+
+            break;
+
+        case 3:
+
+            if(elapsed >= 100)
+            {
+                playingEffect = false;
+
+                currentEffect =
+                    EffectType::NONE;
+
+                noteStart =
+                    millis();
+            }
+
+            break;
+    }
+
+    return;
+}
 
     // =============================
     // MÚSICA NORMAL
@@ -259,42 +324,42 @@ void MusicSystem::resume() {
 
 // =====================================
 
-void MusicSystem::playSuccess() {
+void MusicSystem::playSuccess()
+{
+    currentEffect =
+        EffectType::SUCCESS;
 
-    ledcWriteTone(
-        channel,
-        1200
-    );
+    effectStep = 0;
 
     playingEffect = true;
 
-    effectStart = millis();
+    effectTimer = millis();
 }
 
 // =====================================
 
-void MusicSystem::playError() {
+void MusicSystem::playError()
+{
+    currentEffect =
+        EffectType::ERROR;
 
-    ledcWriteTone(
-        channel,
-        300
-    );
+    effectStep = 0;
 
     playingEffect = true;
 
-    effectStart = millis();
+    effectTimer = millis();
 }
 
 // =====================================
 
-void MusicSystem::playTimeout() {
+void MusicSystem::playTimeout()
+{
+    currentEffect =
+        EffectType::TIMEOUT;
 
-    ledcWriteTone(
-        channel,
-        700
-    );
+    effectStep = 0;
 
     playingEffect = true;
 
-    effectStart = millis();
+    effectTimer = millis();
 }
