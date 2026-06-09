@@ -29,7 +29,8 @@ public:
     );
 
     GameState getState() override;
-
+    
+    void forceRedraw();
 protected:
 
     Question createQuestion() override;

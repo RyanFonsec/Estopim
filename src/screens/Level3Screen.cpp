@@ -215,3 +215,10 @@ void Level3Screen::renderGameplay() {
 
     wallDirty = false;
 }
+
+void Level3Screen::forceRedraw()
+{
+    BaseLevelScreen::forceRedraw();
+
+    wallDirty = true;
+}

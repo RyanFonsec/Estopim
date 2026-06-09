@@ -8,10 +8,11 @@ PauseScreen::PauseScreen(TFT_eSPI* display) {
 void PauseScreen::onEnter() {
 
     tft->fillScreen(TFT_BLACK);
+    needsRender = true;
 }
 
 void PauseScreen::onExit() {
-
+    needsRender = true;
 }
 
 void PauseScreen::update() {
@@ -31,7 +32,7 @@ void PauseScreen::render() {
 
     tft->drawCentreString("PAUSADO", 160, 80, 4);
 
-    tft->drawCentreString("PRETO = VOLTAR", 160, 150, 2);
+    tft->drawCentreString("SUPERIOR ESQUERDO = VOLTAR", 160, 150, 2);
 
-    tft->drawCentreString("BRANCO = RESET", 160, 180, 2);
+    tft->drawCentreString("SUPERIOR DIREITO = RESETAR", 160, 180, 2);
 }

@@ -16,6 +16,8 @@ public:
 
     BaseScreen* getCurrentScreen();
 
+    void resumeScreen(BaseScreen* screen);
+
     void update();
 
     void render();

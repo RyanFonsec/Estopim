@@ -75,3 +75,9 @@ void HUD::renderTimeBar() {
 
     timeDirty = false;
 }
+
+void HUD::forceRedraw() {
+
+    livesDirty = true;
+    timeDirty = true;
+}   

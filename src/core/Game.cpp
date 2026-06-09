@@ -74,7 +74,7 @@ void Game::begin() {
     winScreen = new WinScreen(tft);
     gameOverScreen = new GameOverScreen(tft);
 
-    changeState(GameState::LEVEL1);
+    changeState(GameState::LEVEL4);
 }
 
 // =====================================
@@ -246,7 +246,16 @@ void Game::update() {
         case GameState::LEVEL1:
         {
             if(input.wasPressed(Button::BTN_BLACK)) {
+
+                pausedScreen =
+                    screenManager.getCurrentScreen();
+
+                pausedState =
+                    currentState;
+
                 changeState(GameState::PAUSE);
+
+                return;
             }
 
             Level1Screen* level = static_cast<Level1Screen*>(screenManager.getCurrentScreen());
@@ -270,7 +279,16 @@ void Game::update() {
         case GameState::LEVEL2:
         {
             if(input.wasPressed(Button::BTN_BLACK)) {
+
+                pausedScreen =
+                    screenManager.getCurrentScreen();
+
+                pausedState =
+                    currentState;
+
                 changeState(GameState::PAUSE);
+
+                return;
             }
 
             Level2Screen* level = static_cast<Level2Screen*>(screenManager.getCurrentScreen());
@@ -294,7 +312,16 @@ void Game::update() {
         case GameState::LEVEL3:
         {
             if(input.wasPressed(Button::BTN_BLACK)) {
+
+                pausedScreen =
+                    screenManager.getCurrentScreen();
+
+                pausedState =
+                    currentState;
+
                 changeState(GameState::PAUSE);
+
+                return;
             }
 
             Level3Screen* level =
@@ -326,6 +353,18 @@ void Game::update() {
 
         case GameState::LEVEL4:
         {
+            if(input.wasPressed(Button::BTN_BLACK)) {
+
+                pausedScreen =
+                    screenManager.getCurrentScreen();
+
+                pausedState =
+                    currentState;
+
+                changeState(GameState::PAUSE);
+
+                return;
+            }
             Level4Screen* level =
                 static_cast<Level4Screen*>(
                     screenManager.getCurrentScreen()
@@ -351,20 +390,40 @@ void Game::update() {
         }
 
         case GameState::PAUSE:
-            if(input.wasPressed(Button::BTN_BLACK)) {
-                changeState(GameState::LEVEL1);
+        {
+            if(input.wasPressed(Button::BTN_BLACK))
+            {
+                BaseLevelScreen* level =
+                    static_cast<BaseLevelScreen*>(
+                        pausedScreen
+                    );
+
+                level->forceRedraw();
+
+                screenManager.resumeScreen(
+                    pausedScreen
+                );
+
+                currentState =
+                    pausedState;
+                screenManager.render();
+
+                return;
             }
+
             break;
+        }
 
-        default:
             break;
-    }
+                default:
+                    break;
+            }
 
-    if(input.wasPressed(Button::BTN_WHITE)) {
-        ESP.restart();
-    }
+            if(input.wasPressed(Button::BTN_WHITE)) {
+                ESP.restart();
+            }
 
-    screenManager.update();
+            screenManager.update();
 }
 
 // =====================================

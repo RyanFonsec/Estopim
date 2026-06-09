@@ -191,6 +191,19 @@ void BaseLevelScreen::render() {
     needsRender = false;
 }
 
+void BaseLevelScreen::forceRedraw()
+{
+    staticDrawn = false;
+
+    hud.forceRedraw();
+
+    hudDirty = true;
+
+    questionDirty = true;
+
+    needsRender = true;
+}
+
 void BaseLevelScreen::renderHUD() {
 
     if(!hudDirty) {

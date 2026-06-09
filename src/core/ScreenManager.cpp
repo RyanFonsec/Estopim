@@ -40,3 +40,9 @@ void ScreenManager::render() {
         currentScreen->rendered();
     }
 }
+
+void ScreenManager::resumeScreen(
+    BaseScreen* screen
+) {
+    currentScreen = screen;
+}

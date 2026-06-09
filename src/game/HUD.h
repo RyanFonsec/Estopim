@@ -30,6 +30,8 @@ public:
 
     void render();
 
+    void forceRedraw();
+
 private:
 
     void renderLives();

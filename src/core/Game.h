@@ -34,6 +34,9 @@ private:
     MusicSystem music;
     FeedbackSystem* feedback;
     GameState currentState;
+    BaseScreen* pausedScreen;
+
+    GameState pausedState;
 
     // =====================================
     // SCREENS (Como Ponteiros)

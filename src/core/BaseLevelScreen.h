@@ -63,6 +63,8 @@ public:
 
     void render() override;
 
+    virtual void forceRedraw();
+
     bool isFinished();
 
     bool isPlayerDead();

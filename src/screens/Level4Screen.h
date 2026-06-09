@@ -37,7 +37,7 @@ public:
     GameState getState() override;
 
     void onEnter() override;
-
+    void forceRedraw() override;
 protected:
 
     Question createQuestion() override;

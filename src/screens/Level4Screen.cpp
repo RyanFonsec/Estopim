@@ -327,3 +327,10 @@ void Level4Screen::renderGameplay() {
 
     wallDirty = false;
 }
+
+void Level4Screen::forceRedraw()
+{
+    BaseLevelScreen::forceRedraw();
+
+    wallDirty = true;
+}
