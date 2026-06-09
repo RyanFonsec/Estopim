@@ -29,12 +29,12 @@ void MenuScreen::render() {
     tft->fillScreen(TFT_BLACK);
 
     tft->setSwapBytes(true);
-/*
+
     tft->pushImage(
         0,
         0,
         320,
         240,
         menu_bg
-    );*/
+    );
 }

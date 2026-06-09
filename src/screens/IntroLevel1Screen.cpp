@@ -28,12 +28,12 @@ GameState IntroLevel1Screen::getState() {
 void IntroLevel1Screen::render() {
 
     tft->setSwapBytes(true);
-/*
+
     tft->pushImage(
         0,
         0,
         320,
         240,
         Intro_Level1_Screen
-    );*/
+    );
 }
