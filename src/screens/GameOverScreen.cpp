@@ -30,9 +30,9 @@ void GameOverScreen::render() {
     // FUTURO:
     // Sprite derrota
 
-    tft->setTextColor(TFT_WHITE);
+    tft->setTextColor(TFT_BLACK);
 
-    tft->drawCentreString("GAME OVER", 160, 100, 4);
+    tft->drawCentreString("NOSSO FIM !!", 160, 100, 4);
 
-    tft->drawCentreString("A CIDADE CAIU...", 160, 150, 2);
+    tft->drawCentreString("PERDIDO...", 160, 150, 2);
 }

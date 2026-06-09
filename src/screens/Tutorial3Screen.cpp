@@ -27,13 +27,13 @@ GameState Tutorial3Screen::getState() {
 void Tutorial3Screen::render() {
 
     tft->setSwapBytes(true);
-    
+    /*
     tft->pushImage(
         0,
         0,
         320,
         240,
         Tutorial3_Screen
-    );
+    );*/
 
 }

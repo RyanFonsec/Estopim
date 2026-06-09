@@ -27,13 +27,13 @@ GameState IntroScreen::getState() {
 void IntroScreen::render() {
 
     tft->setSwapBytes(true);
-    
+   /* 
     tft->pushImage(
         0,
         0,
         320,
         240,
         Intro_screen
-    );
+    );*/
 
 }

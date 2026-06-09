@@ -1,4 +1,5 @@
 #include "WinScreen.h"
+#include "../assets/screen/win_screen.h"
 
 WinScreen::WinScreen(TFT_eSPI* display) {
 
@@ -25,14 +26,15 @@ GameState WinScreen::getState() {
 
 void WinScreen::render() {
 
-    tft->fillScreen(TFT_GREEN);
+    tft->fillScreen(TFT_BLACK);
 
-    // FUTURO:
-    // Sprite de vitória
-
-    tft->setTextColor(TFT_BLACK);
-
-    tft->drawCentreString("VOCE VENCEU!", 160, 100, 4);
-
-    tft->drawCentreString("SALVADOR FOI SALVA", 160, 150, 2);
+    tft->setSwapBytes(true);
+    
+    tft->pushImage(
+        0,
+        0,
+        320,
+        240,
+        win_screen
+    );
 }
