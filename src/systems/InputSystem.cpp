@@ -13,7 +13,7 @@ void InputSystem::begin() {
 
     for(int i = 0; i < 5; i++) {
 
-        pinMode(buttonPins[i], INPUT);
+        pinMode(buttonPins[i], INPUT_PULLDOWN);
 
         currentState[i] = false;
 
